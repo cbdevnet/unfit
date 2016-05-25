@@ -44,13 +44,4 @@
         android:layout_centerHorizontal="true"
         android:onClick="toggleVibration" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Gather passive"
-        android:id="@+id/button6"
-        android:layout_below="@+id/button5"
-        android:layout_centerHorizontal="true"
-        android:onClick="gatherPassive" />
-
 </RelativeLayout>

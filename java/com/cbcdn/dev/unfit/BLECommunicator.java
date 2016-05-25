@@ -19,6 +19,7 @@ import java.util.Map;
 public class BLECommunicator extends Service {
     private DatabaseManager db;
     private Map<String,BLEDevice> devices = new HashMap<>();
+    private BLECommunicator self = this;
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -54,6 +55,11 @@ public class BLECommunicator extends Service {
                     break;
                 case "com.cbcdn.dev.unfit.request.heartrate":
                     break;
+                case "com.cbcdn.dev.unfit.reconnect":
+                    for(BLEDevice device : devices.values()){
+                        device.connect(self);
+                    }
+                    break;
             }
         }
     };
@@ -70,6 +76,7 @@ public class BLECommunicator extends Service {
         filter.addAction("com.cbcdn.dev.unfit.vibration.start");
         filter.addAction("com.cbcdn.dev.unfit.vibration.stop");
         filter.addAction("com.cbcdn.dev.unfit.selftest");
+        filter.addAction("com.cbcdn.dev.unfit.reconnect");
         filter.addAction("com.cbcdn.dev.unfit.request.gather");
         filter.addAction("com.cbcdn.dev.unfit.request.heartrate");
         registerReceiver(receiver, filter);

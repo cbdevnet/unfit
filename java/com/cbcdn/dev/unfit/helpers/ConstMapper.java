@@ -49,8 +49,8 @@ public final class ConstMapper {
         MILI("Main Service", "0000fee0-0000-1000-8000-00805f9b34fb"),
         VIBRATE("Vibration", "00001802-0000-1000-8000-00805f9b34fb"),
         HEARTRATE("Heart Rate", "0000180d-0000-1000-8000-00805f9b34fb"),
-        GAP_SERVICE("GAP Service", "00001800-0000-1000-8000-00805f9b34fb"),
-        GAP("Generic Attribute Profile", "00001801-0000-1000-8000-00805f9b34fb"),
+        ACCESS("Generic Access", "00001800-0000-1000-8000-00805f9b34fb"),
+        ATTRIBUTES("Generic Attribute", "00001801-0000-1000-8000-00805f9b34fb"),
 
         UNKNOWN_1("Unknown 1", "0000fee1-0000-1000-8000-00805f9b34fb");
 
@@ -103,12 +103,12 @@ public final class ConstMapper {
         HEARTRATE_NOTIFICATION(Service.HEARTRATE, "Heart rate notification", "00002a37-0000-1000-8000-00805f9b34fb"),
         HEARTRATE(Service.HEARTRATE, "Heart rate", "00002a39-0000-1000-8000-00805f9b34fb"),
 
-        GENERIC_DEVICE_NAME(Service.GAP_SERVICE, "Device name", "00002a00-0000-1000-8000-00805f9b34fb"),
-        GENERIC_DEVICE_APPEARANCE(Service.GAP_SERVICE, "Device appearance", "00002a01-0000-1000-8000-00805f9b34fb"),
-        PERIPHERAL_PRIVACY(Service.GAP_SERVICE, "Peripheral privacy", "00002a02-0000-1000-8000-00805f9b34fb"),
-        CONNECTION_PARAMS(Service.GAP_SERVICE, "Preferred connection parameters", "00002a04-0000-1000-8000-00805f9b34fb"),
+        GENERIC_DEVICE_NAME(Service.ACCESS, "Device name", "00002a00-0000-1000-8000-00805f9b34fb"),
+        GENERIC_DEVICE_APPEARANCE(Service.ACCESS, "Device appearance", "00002a01-0000-1000-8000-00805f9b34fb"),
+        PERIPHERAL_PRIVACY(Service.ACCESS, "Peripheral privacy", "00002a02-0000-1000-8000-00805f9b34fb"),
+        CONNECTION_PARAMS(Service.ACCESS, "Preferred connection parameters", "00002a04-0000-1000-8000-00805f9b34fb"),
 
-        SERVICE_CHANGED(Service.GAP, "GAP Service changed", "00002a05-0000-1000-8000-00805f9b34fb"),
+        SERVICE_CHANGED(Service.ATTRIBUTES, "GAP Service changed", "00002a05-0000-1000-8000-00805f9b34fb"),
 
 
         VIBRATION(Service.VIBRATE, "Vibration", "00002a06-0000-1000-8000-00805f9b34fb");

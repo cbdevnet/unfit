@@ -15,4 +15,16 @@
     <item android:id="@+id/setup_device"
         android:title="@string/setup_device"
         />
+
+    <item android:id="@+id/reconnect"
+        android:title="@string/reconnect"
+        />
+
+    <item android:id="@+id/fetch"
+        android:title="@string/fetch"
+        />
+
+    <item android:id="@+id/fetch_hr"
+        android:title="@string/read"
+        />
 </menu>
