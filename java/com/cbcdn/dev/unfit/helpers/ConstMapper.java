@@ -88,7 +88,7 @@ public final class ConstMapper {
         DEVICE_NAME(Service.MILI, "Device name", "0000ff02-0000-1000-8000-00805f9b34fb"),
         NOTIFICATION(Service.MILI, "Notification?", "0000ff03-0000-1000-8000-00805f9b34fb"),
         USER_INFO(Service.MILI, "User info", "0000ff04-0000-1000-8000-00805f9b34fb"),
-        CONTROL_POINT(Service.MILI, "Control point?", "0000ff05-0000-1000-8000-00805f9b34fb"),
+        CONTROL(Service.MILI, "Control", "0000ff05-0000-1000-8000-00805f9b34fb"),
         REALTIME_STEPS(Service.MILI, "Realtime steps", "0000ff06-0000-1000-8000-00805f9b34fb"),
         ACTIVITY(Service.MILI, "Activity?", "0000ff07-0000-1000-8000-00805f9b34fb"),
         FIRMWARE(Service.MILI, "Firmware data", "0000ff08-0000-1000-8000-00805f9b34fb"),
@@ -150,12 +150,14 @@ public final class ConstMapper {
 
     public enum Command {
         PAIR(new byte[]{2}),
-        TEST(new byte[]{2}),
+        SELF_TEST(new byte[]{2}),
         VIBRATE2(new byte[]{4}),
         VIBRATE2_LED2(new byte[]{3}),
         VIBRATE10_LED(new byte[]{2}),
         VIBRATE2_LED(new byte[]{1}),
-        VIBRATION_STOP(new byte[]{0});
+        VIBRATION_STOP(new byte[]{0}),
+
+        TEST_COMMAND(new byte[]{8, 2});
 
         private byte[] command;
 

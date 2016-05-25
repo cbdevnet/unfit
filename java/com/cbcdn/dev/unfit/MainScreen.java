@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 public class MainScreen extends Activity {
     public final static int REQUEST_MAC = 1;
+    public final static int REQUEST_CONFIG = 2;
     private DatabaseManager db;
     private boolean vibrating = false;
 
@@ -17,17 +20,10 @@ public class MainScreen extends Activity {
         if(requestCode == REQUEST_MAC) {
             if(resultCode == RESULT_OK) {
                 Log.d("MainScreen", "Configuration screen returned device MAC " + data.getStringExtra("MAC"));
-                db.getWritableDatabase().execSQL("INSERT INTO devices (mac, is_def) VALUES (?, ?);", new Object[]{data.getStringExtra("MAC"), 0});
+                db.getWritableDatabase().execSQL("INSERT ON CONFLICT IGNORE INTO devices (mac, is_def) VALUES (?, ?);", new Object[]{data.getStringExtra("MAC"), 0});
+                startActivity(new Intent(this, SettingsActivity.class));
             }
         }
-    }
-
-    //If no device registered, go to pairing activity
-    //Menu: Unregister, Change active device, Pair new device,
-    //Change setting
-    public void runPairingActivity(View v){
-        Log.d("Main", "Starting scanner view");
-        startActivityForResult(new Intent(this, PairActivity.class), 1);
     }
 
     public void runGATTDump(View v){
@@ -42,6 +38,10 @@ public class MainScreen extends Activity {
         this.sendBroadcast(new Intent().setAction("com.cbcdn.dev.unfit.selftest"));
     }
 
+    public void gatherPassive(View v){
+        this.sendBroadcast(new Intent().setAction("com.cbcdn.dev.unfit.request.gather"));
+    }
+
     public void toggleVibration(View v){
         if(vibrating){
             this.sendBroadcast(new Intent().setAction("com.cbcdn.dev.unfit.vibration.stop"));
@@ -49,7 +49,7 @@ public class MainScreen extends Activity {
         else{
             this.sendBroadcast(new Intent().setAction("com.cbcdn.dev.unfit.vibration.start"));
         }
-        vibrating = !vibrating;
+        //vibrating = !vibrating;
     }
 
     @Override
@@ -66,8 +66,25 @@ public class MainScreen extends Activity {
         db = new DatabaseManager(this);
         if(db.getReadableDatabase().rawQuery("SELECT * FROM devices;", null).getCount() < 1){
             Log.d("MainScreen", "No device configured, running pairing dialog");
-            startActivityForResult(new Intent(this, PairActivity.class), 1);
+            startActivityForResult(new Intent(this, PairActivity.class), REQUEST_MAC);
         }
         getApplicationContext().startService(new Intent(this.getApplicationContext(), BLECommunicator.class));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.pair_device:
+                startActivityForResult(new Intent(this, PairActivity.class), REQUEST_MAC);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

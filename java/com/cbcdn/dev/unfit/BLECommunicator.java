@@ -30,7 +30,8 @@ public class BLECommunicator extends Service {
                 case "com.cbcdn.dev.unfit.vibration.start":
                     Log.d("BLE service", "Starting vibration");
                     for(BLEDevice device : devices.values()){
-                        device.requestWrite(Characteristic.VIBRATION, Command.VIBRATE10_LED.getCommand());
+                        device.requestWrite(Characteristic.VIBRATION, Command.VIBRATE2.getCommand());
+                        //device.requestWrite(Characteristic.CONTROL_POINT, Command.TEST_COMMAND.getCommand());
                     }
                     break;
                 case "com.cbcdn.dev.unfit.vibration.stop":
@@ -42,8 +43,16 @@ public class BLECommunicator extends Service {
                 case "com.cbcdn.dev.unfit.selftest":
                     Log.d("BLE service", "Self-testing all devices");
                     for(BLEDevice device : devices.values()){
-                        device.requestWrite(Characteristic.TEST, Command.TEST.getCommand());
+                        device.requestWrite(Characteristic.TEST, Command.SELF_TEST.getCommand());
                     }
+                    break;
+                case "com.cbcdn.dev.unfit.request.gather":
+                    Log.d("BLE service", "Gathering passive data");
+                    for(BLEDevice device : devices.values()){
+                        device.requestPassiveDataRead();
+                    }
+                    break;
+                case "com.cbcdn.dev.unfit.request.heartrate":
                     break;
             }
         }
@@ -61,6 +70,8 @@ public class BLECommunicator extends Service {
         filter.addAction("com.cbcdn.dev.unfit.vibration.start");
         filter.addAction("com.cbcdn.dev.unfit.vibration.stop");
         filter.addAction("com.cbcdn.dev.unfit.selftest");
+        filter.addAction("com.cbcdn.dev.unfit.request.gather");
+        filter.addAction("com.cbcdn.dev.unfit.request.heartrate");
         registerReceiver(receiver, filter);
     }
 

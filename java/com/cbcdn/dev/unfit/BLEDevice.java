@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
+import android.util.Pair;
 
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
@@ -16,6 +17,8 @@ import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class BLEDevice {
     private static String dumpBytes(byte[] data){
@@ -31,13 +34,46 @@ public class BLEDevice {
     private BTLEState state = BTLEState.DISCONNECTED;
     private BLEDevice self = this;
 
+    private class RWQEntry {
+        private Characteristic characteristic;
+        private boolean write = false;
+        private byte[] data;
+        public boolean inProgress = false;
+
+        public RWQEntry(Characteristic characteristic){
+            this.characteristic = characteristic;
+        }
+
+        public RWQEntry(Characteristic characteristic, byte[] data){
+            this.characteristic = characteristic;
+            this.data = data;
+            this.write = true;
+        }
+
+        public boolean matches(Characteristic characteristic, boolean write){
+            return this.characteristic == characteristic && this.write == write;
+        }
+
+        public void perform(){
+            inProgress = true;
+            if(write){
+                self.performWrite(characteristic, data);
+            }
+            else{
+                self.performRead(characteristic);
+            }
+        }
+    }
+
+    private List<RWQEntry> gattQueue = new LinkedList<>();
+
     private BluetoothGattCallback callback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
 
             state = BTLEState.getByValue(newState);
-            Log.d("BTLE callback", device.getAddress() + ": Connection state changed to " + state + ", status " + status);
+            Log.d("BLE callback", device.getAddress() + ": Connection state changed to " + state + ", status " + status);
             if(newState == BTLEState.CONNECTED.getValue()){
                 Log.d("BLE callback", "Connection established, starting service discovery");
                 gatt.discoverServices();
@@ -59,7 +95,7 @@ public class BLEDevice {
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
-            Log.d("BTLE Callback", "Characteristic write: "
+            Log.d("BLE Callback", "Characteristic write: "
                     + status
                     + " " + (Characteristic.fromUUID(characteristic.getUuid()) == null ?
                     characteristic.getUuid() :
@@ -70,24 +106,44 @@ public class BLEDevice {
                 Log.d("BLE callback", "Detected write of pairing characteristic, rechecking");
                 self.requestRead(Characteristic.PAIR);
             }
+
+            RWQEntry head = gattQueue.size() > 0 ? gattQueue.get(0) : null;
+            if(head != null && head.inProgress && head.matches(Characteristic.fromUUID(characteristic.getUuid()), true)){
+                gattQueue.remove(0);
+                //TODO might call callback here
+                workQueue();
+            }
         }
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicRead(gatt, characteristic, status);
-            Log.d("BLE callback", "Characteristic read: "
-                    + status
-                    + " " + (Characteristic.fromUUID(characteristic.getUuid()) == null ?
-                    characteristic.getUuid() :
-                    Characteristic.fromUUID(characteristic.getUuid()).toString())
-                    + ": " + dumpBytes(characteristic.getValue()));
 
-            if(Characteristic.fromUUID(characteristic.getUuid()) == Characteristic.PAIR) {
-                if (Arrays.equals(characteristic.getValue(), new byte[]{(byte) 0xFF, (byte) 0xFF})) {
-                    Log.d("BLE callback", "Unpaired device detected, trying to pair");
-                    self.requestWrite(Characteristic.PAIR, Command.PAIR.getCommand());
-                } else {
-                    Log.d("BLE callback", "Paired device detected");
+            Characteristic c = Characteristic.fromUUID(characteristic.getUuid());
+
+            if(c == null){
+                Log.d("BLE callback", "Characteristic read: "
+                        + status
+                        + " " + characteristic.getUuid() + ": " + dumpBytes(characteristic.getValue()));
+            }
+            else {
+                Log.d("BLE callback", "Characteristic " + c + " read: "
+                        + status + " " + dumpBytes(characteristic.getValue()));
+
+                if (Characteristic.fromUUID(characteristic.getUuid()) == Characteristic.PAIR) {
+                    if (Arrays.equals(characteristic.getValue(), new byte[]{(byte) 0xFF, (byte) 0xFF})) {
+                        Log.d("BLE callback", "Unpaired device detected, trying to pair");
+                        self.requestWrite(Characteristic.PAIR, Command.PAIR.getCommand());
+                    } else {
+                        Log.d("BLE callback", "Paired device detected");
+                    }
+                }
+
+                RWQEntry head = gattQueue.size() > 0 ? gattQueue.get(0) : null;
+                if (head != null && head.inProgress && head.matches(Characteristic.fromUUID(characteristic.getUuid()), false)) {
+                    gattQueue.remove(0);
+                    //TODO might call callback here
+                    workQueue();
                 }
             }
         }
@@ -111,25 +167,25 @@ public class BLEDevice {
         @Override
         public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
             super.onDescriptorWrite(gatt, descriptor, status);
-            Log.d("BTLE Callback", "Descriptor write: " + status + " " + descriptor.toString() + " " + dumpBytes(descriptor.getValue()));
+            Log.d("BLE Callback", "Descriptor write: " + status + " " + descriptor.toString() + " " + dumpBytes(descriptor.getValue()));
         }
 
         @Override
         public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
             super.onReliableWriteCompleted(gatt, status);
-            Log.d("BTLE Callback", "Reliable write done: " + status);
+            Log.d("BLE Callback", "Reliable write done: " + status);
         }
 
         @Override
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
             super.onReadRemoteRssi(gatt, rssi, status);
-            Log.d("BTLE Callback", "RSSI changed: " + status + " " + rssi);
+            Log.d("BLE Callback", "RSSI changed: " + status + " " + rssi);
         }
 
         @Override
         public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
             super.onMtuChanged(gatt, mtu, status);
-            Log.d("BTLE Callback", "MTU changed: " + status + " " + mtu);
+            Log.d("BLE Callback", "MTU changed: " + status + " " + mtu);
         }
     };
 
@@ -161,7 +217,60 @@ public class BLEDevice {
         this.gatt = device.connectGatt(context, false, callback);
     }
 
+    public boolean requestPassiveDataRead(){
+        return this.requestRead(Characteristic.ACTIVITY)
+                && this.requestRead(Characteristic.BATTERY)
+                && this.requestRead(Characteristic.USER_INFO)
+                && this.requestRead(Characteristic.BLE_PARAMS)
+                && this.requestRead(Characteristic.DEVICE_INFO)
+                && this.requestRead(Characteristic.DEVICE_NAME)
+                && this.requestRead(Characteristic.TIME)
+                && this.requestRead(Characteristic.CONNECTION_PARAMS)
+                && this.requestRead(Characteristic.GENERIC_DEVICE_APPEARANCE)
+                && this.requestRead(Characteristic.GENERIC_DEVICE_NAME)
+                && this.requestRead(Characteristic.NOTIFICATION)
+                && this.requestRead(Characteristic.PERIPHERAL_PRIVACY)
+                && this.requestRead(Characteristic.REALTIME_STEPS)
+                && this.requestRead(Characteristic.SENSOR)
+                && this.requestRead(Characteristic.STATISTICS);
+    }
+
     public boolean requestRead(Characteristic characteristic){
+        if(state != BTLEState.CONNECTED){
+            Log.d("BLE read", "Device not connected");
+            return false;
+        }
+
+        //TODO check for discovered services
+        Log.d("BLE Queue", "Enqueueing read for " + characteristic);
+        gattQueue.add(new RWQEntry(characteristic));
+        workQueue();
+        return true;
+    }
+
+    public boolean requestWrite(Characteristic characteristic, byte[] data){
+        if(state != BTLEState.CONNECTED){
+            Log.d("BLE read", "Device not connected");
+            return false;
+        }
+
+        //TODO check for discovered services
+        Log.d("BLE Queue", "Enqueueing write for " + characteristic);
+        gattQueue.add(new RWQEntry(characteristic, data));
+        workQueue();
+        return true;
+    }
+
+    private void workQueue(){
+        Log.d("BLE queue", "Running queue of size " + gattQueue.size());
+
+        RWQEntry head = gattQueue.size() > 0 ? gattQueue.get(0) : null;
+        if(head != null && !head.inProgress){
+            head.perform();
+        }
+    }
+
+    private boolean performRead(Characteristic characteristic){
         if(gatt == null){
             Log.d("BLE read", "Request failed, no connection");
             return false;
@@ -181,7 +290,7 @@ public class BLEDevice {
         }
 
         if(!gatt.readCharacteristic(c)){
-            Log.d("BLE read", "Characteristic read request failed");
+            Log.d("BLE read", "Characteristic read request failed for " + characteristic);
             return false;
         }
 
@@ -189,7 +298,7 @@ public class BLEDevice {
         return true;
     }
 
-    public boolean requestWrite(Characteristic characteristic, byte[] data){
+    private boolean performWrite(Characteristic characteristic, byte[] data){
         if(gatt == null){
             Log.d("BLE write", "Write request failed, no connection");
             return false;
@@ -214,7 +323,7 @@ public class BLEDevice {
         }
 
         if(!gatt.writeCharacteristic(c)){
-            Log.d("BLE write", "Characteristic write returned false");
+            Log.d("BLE write", "Characteristic write request failed for " + characteristic);
             return false;
         }
 

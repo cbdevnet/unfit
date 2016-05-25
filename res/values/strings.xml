@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">UnFit</string>
+    <string name="pair_device">Pair new device</string>
+    <string name="unpair_device">Unpair this device</string>
+    <string name="change_device">Change active device</string>
+    <string name="setup_device">Configure device</string>
 </resources>

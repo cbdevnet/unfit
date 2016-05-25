@@ -12,18 +12,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Run Pairing"
-        android:id="@+id/button"
-        android:onClick="runPairingActivity"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="112dp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="Run GATT Dump"
         android:id="@+id/button2"
-        android:layout_below="@+id/button"
         android:layout_centerHorizontal="true"
         android:onClick="runGATTDump" />
 
@@ -48,10 +38,19 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Toggle vibration"
+        android:text="Vibrate 2"
         android:id="@+id/button5"
         android:layout_below="@+id/button4"
         android:layout_centerHorizontal="true"
         android:onClick="toggleVibration" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gather passive"
+        android:id="@+id/button6"
+        android:layout_below="@+id/button5"
+        android:layout_centerHorizontal="true"
+        android:onClick="gatherPassive" />
 
 </RelativeLayout>
