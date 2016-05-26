@@ -12,7 +12,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scan for devices"
+        android:text="@string/scan_devices"
         android:id="@+id/scanDevices"
         android:layout_centerHorizontal="true"
         android:onClick="scanForDevices" />

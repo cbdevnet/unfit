@@ -87,9 +87,6 @@ public class BLEDevice {
             for(BluetoothGattService service : gatt.getServices()){
                 Log.d("BLE callback", "Service discovered: " + (Service.fromUUID(service.getUuid()) == null ? service.getUuid() : Service.fromUUID(service.getUuid()).toString()));
             }
-
-            Log.d("BLE callback", "Testing for device bond");
-            self.requestRead(Characteristic.PAIR);
         }
 
         @Override
@@ -101,11 +98,6 @@ public class BLEDevice {
                     characteristic.getUuid() :
                     Characteristic.fromUUID(characteristic.getUuid()).toString())
                     + ": " + dumpBytes(characteristic.getValue()));
-
-            if(Characteristic.fromUUID(characteristic.getUuid()) == Characteristic.PAIR){
-                Log.d("BLE callback", "Detected write of pairing characteristic, rechecking");
-                self.requestRead(Characteristic.PAIR);
-            }
 
             RWQEntry head = gattQueue.size() > 0 ? gattQueue.get(0) : null;
             if(head != null && head.inProgress && head.matches(Characteristic.fromUUID(characteristic.getUuid()), true)){
@@ -129,16 +121,6 @@ public class BLEDevice {
             else {
                 Log.d("BLE callback", "Characteristic " + c + " read: "
                         + status + " " + dumpBytes(characteristic.getValue()));
-
-                if (Characteristic.fromUUID(characteristic.getUuid()) == Characteristic.PAIR) {
-                    if (Arrays.equals(characteristic.getValue(), new byte[]{(byte) 0xFF, (byte) 0xFF})) {
-                        Log.d("BLE callback", "Unpaired device detected, trying to pair");
-                        self.requestWrite(Characteristic.PAIR, Command.PAIR.getCommand());
-                    } else {
-                        Log.d("BLE callback", "Paired device detected");
-                    }
-                }
-
                 RWQEntry head = gattQueue.size() > 0 ? gattQueue.get(0) : null;
                 if (head != null && head.inProgress && head.matches(Characteristic.fromUUID(characteristic.getUuid()), false)) {
                     gattQueue.remove(0);

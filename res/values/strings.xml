@@ -51,4 +51,7 @@
     <string name="pref_user_dialog">Username to use for synchronization</string>
     <string name="pref_password">Synchronization password</string>
     <string name="pref_password_dialog">Password to use for synchronization</string>
+    <string name="manual_sync">Synchronize now</string>
+    <string name="scan_devices">Scan for devices</string>
+    <string name="manage_devices">Device management</string>
 </resources>
