@@ -8,15 +8,11 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
-import android.util.Pair;
 
-import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Service;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -120,7 +116,7 @@ public class BLEDevice {
             }
             else {
                 Log.d("BLE callback", "Characteristic " + c + " read: "
-                        + status + " " + dumpBytes(characteristic.getValue()));
+                        + status + " " + dumpBytes(characteristic.getValue()) + ": " + c.interpret(characteristic.getValue()));
                 RWQEntry head = gattQueue.size() > 0 ? gattQueue.get(0) : null;
                 if (head != null && head.inProgress && head.matches(Characteristic.fromUUID(characteristic.getUuid()), false)) {
                     gattQueue.remove(0);

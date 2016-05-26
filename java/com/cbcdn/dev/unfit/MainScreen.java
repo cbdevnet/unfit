@@ -23,6 +23,8 @@ public class MainScreen extends Activity {
             if(resultCode == RESULT_OK && data.hasExtra("MAC")) {
                 currentMAC = data.getStringExtra("MAC");
                 Log.d("MainScreen", "Pairing screen returned device MAC " + currentMAC);
+                //TODO start pairing process + datetime update + firmware update
+                //TODO update settings shared prefs
                 db.getWritableDatabase().execSQL("INSERT ON CONFLICT IGNORE INTO devices (mac, is_def) VALUES (?, ?);", new Object[]{currentMAC, 0});
                 startActivity(new Intent(this, SettingsActivity.class).putExtra("MAC", currentMAC));
             }
