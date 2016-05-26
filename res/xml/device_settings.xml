@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/user_settings"
+        android:key="user">
+
+        <ListPreference
+            android:key="gender"
+            android:title="@string/pref_gender"
+            android:dialogTitle="@string/pref_gender_select"
+            android:entries="@array/pref_genders"
+            android:entryValues="@array/pref_gender_map"
+            android:defaultValue="@string/pref_gender_male"
+            android:summary="%s"/>
+
+        <EditTextPreference
+            android:key="age"
+            android:title="@string/pref_age"
+            android:dialogTitle="@string/pref_age_dialog"
+            android:inputType="number"
+            />
+
+        <EditTextPreference
+            android:key="height"
+            android:title="@string/pref_height"
+            android:dialogTitle="@string/pref_height_dialog"
+            android:inputType="number"
+            />
+
+        <EditTextPreference
+            android:key="weight"
+            android:title="@string/pref_weight"
+            android:dialogTitle="@string/pref_weight_dialog"
+            android:inputType="number"
+            />
+
+        <ListPreference
+            android:key="side"
+            android:title="@string/pref_side"
+            android:dialogTitle="@string/pref_side_dialog"
+            android:entries="@array/pref_side_worn"
+            android:entryValues="@array/pref_side_map"
+            android:defaultValue="@string/pref_side_right"
+            android:summary="%s" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/sync_settings"
+        android:key="sync">
+
+        <SwitchPreference
+            android:key="do_sync"
+            android:title="@string/pref_sync"
+            android:defaultValue="true"
+            android:summaryOn="@string/pref_sync_on"
+            android:summaryOff="@string/pref_sync_off" />
+
+        <SwitchPreference
+            android:key="wifi"
+            android:dependency="do_sync"
+            android:title="@string/pref_wifi"
+            android:defaultValue="true"
+            android:summaryOn="@string/pref_sync_wifi"
+            android:summaryOff="@string/pref_sync_any" />
+
+        <EditTextPreference
+            android:dependency="do_sync"
+            android:key="sync_remote"
+            android:title="@string/pref_remote"
+            android:dialogTitle="@string/pref_remote_dialog"
+            android:defaultValue="@string/pref_remote_default" />
+
+        <EditTextPreference
+            android:dependency="do_sync"
+            android:key="user"
+            android:title="@string/pref_user"
+            android:dialogTitle="@string/pref_user_dialog" />
+
+        <EditTextPreference
+            android:dependency="do_sync"
+            android:key="password"
+            android:title="@string/pref_password"
+            android:dialogTitle="@string/pref_password_dialog"/>
+
+        <ListPreference
+            android:key="sync_interval"
+            android:dependency="do_sync"
+            android:title="@string/pref_sync_interval"
+            android:dialogTitle="@string/pref_sync_interval_dialog"
+            android:entries="@array/pref_sync_interval"
+            android:entryValues="@array/pref_sync_map"
+            android:defaultValue="@string/pref_sync_1h"
+            android:summary="%s" />
+
+        </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/misc_settings"
+        android:key="misc">
+        <SwitchPreference
+            android:key="alarm_react"
+            android:title="@string/pref_alarm"
+            android:defaultValue="false"
+            android:summaryOn="@string/pref_alarm_on"
+            android:summaryOff="@string/pref_alarm_off" />
+
+        <ListPreference
+            android:key="data_interval"
+            android:title="@string/pref_data_interval"
+            android:dialogTitle="@string/pref_data_interval_dialog"
+            android:entries="@array/pref_sync_interval"
+            android:entryValues="@array/pref_sync_map"
+            android:defaultValue="@string/pref_sync_1h"
+            android:summary="%s" />
+        />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -3,6 +3,7 @@ package com.cbcdn.dev.unfit;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,6 +61,10 @@ public class MainScreen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
+
+        //FIXME this loads the default values into the settings dialog
+        //need to replace them with the current band settings when starting settings
+        PreferenceManager.setDefaultValues(this, R.xml.device_settings, false);
 
         db = new DatabaseManager(this);
         if(db.getReadableDatabase().rawQuery("SELECT * FROM devices;", null).getCount() < 1){

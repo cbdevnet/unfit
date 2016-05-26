@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_genders">
+        <item>@string/pref_gender_male</item>
+        <item>@string/pref_gender_female</item>
+        <item>@string/pref_gender_other</item>
+    </string-array>
+    <string-array name="pref_gender_map">
+        <item>1</item>
+        <item>0</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="pref_side_worn">
+        <item>@string/pref_side_left</item>
+        <item>@string/pref_side_right</item>
+    </string-array>
+    <string-array name="pref_side_map">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="pref_sync_interval">
+        <item>@string/pref_sync_manual</item>
+        <item>@string/pref_sync_1h</item>
+        <item>@string/pref_sync_2h</item>
+        <item>@string/pref_sync_6h</item>
+        <item>@string/pref_sync_12h</item>
+        <item>@string/pref_sync_day</item>
+    </string-array>
+    <string-array name="pref_sync_map">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>6</item>
+        <item>12</item>
+        <item>24</item>
+    </string-array>
+</resources>

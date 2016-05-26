@@ -1,0 +1,14 @@
+05-26 12:34:04.927 12427-12448/com.cbcdn.dev.unfit D/BLE callback: Characteristic Battery read: 0 59E201140C0514060004
+05-26 12:34:05.018 12427-12447/com.cbcdn.dev.unfit D/BLE callback: Characteristic User info read: 0 
+05-26 12:34:05.116 12427-12448/com.cbcdn.dev.unfit D/BLE callback: Characteristic BLE parameters read: 0 CC01F4010000D00724006009
+05-26 12:34:05.200 12427-12447/com.cbcdn.dev.unfit D/BLE callback: Characteristic Device info read: 0 C86AAD8E040004CF00060002130B0F0400000000
+05-26 12:34:05.289 12427-12448/com.cbcdn.dev.unfit D/BLE callback: Characteristic Device name read: 0 00FFFF4D493153
+05-26 12:34:05.376 12427-12447/com.cbcdn.dev.unfit D/BLE callback: Characteristic Time read: 0 
+05-26 12:34:05.469 12427-12448/com.cbcdn.dev.unfit D/BLE callback: Characteristic Preferred connection parameters read: 0 060050000000F401
+05-26 12:34:05.559 12427-12447/com.cbcdn.dev.unfit D/BLE callback: Characteristic Device appearance read: 0 0000
+05-26 12:34:05.648 12427-12448/com.cbcdn.dev.unfit D/BLE callback: Characteristic Device name read: 0 4D49
+05-26 12:34:05.740 12427-12447/com.cbcdn.dev.unfit D/BLE callback: Characteristic Notification? read: 0 1B
+05-26 12:34:05.828 12427-12448/com.cbcdn.dev.unfit D/BLE callback: Characteristic Peripheral privacy read: 0 00
+05-26 12:34:05.919 12427-12447/com.cbcdn.dev.unfit D/BLE callback: Characteristic Realtime steps read: 0 CB080000
+05-26 12:34:06.019 12427-12448/com.cbcdn.dev.unfit D/BLE callback: Characteristic Sensor data? read: 0 
+05-26 12:34:06.097 12427-12447/com.cbcdn.dev.unfit D/BLE callback: Characteristic Statistics read: 0 
