@@ -31,8 +31,8 @@ public class MainScreen extends Activity {
         }
     }
 
-    public void runGATTDump(View v){
-
+    public void runFirmwareUpdate(View v){
+        this.sendBroadcast(new Intent().setAction("com.cbcdn.dev.unfit.update_firmware"));
     }
 
     public void startService(View v){

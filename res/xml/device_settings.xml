@@ -103,6 +103,13 @@
             android:summaryOn="@string/pref_alarm_on"
             android:summaryOff="@string/pref_alarm_off" />
 
+        <SwitchPreference
+            android:key="call_react"
+            android:title="@string/pref_call"
+            android:defaultValue="false"
+            android:summaryOn="@string/pref_call_on"
+            android:summaryOff="@string/pref_call_off" />
+
         <ListPreference
             android:key="data_interval"
             android:title="@string/pref_data_interval"
@@ -112,5 +119,22 @@
             android:defaultValue="@string/pref_sync_1h"
             android:summary="%s" />
         />
+
+        <ListPreference
+            android:key="hr_interval"
+            android:title="@string/pref_hr_interval"
+            android:dialogTitle="@string/pref_hr_interval_dialog"
+            android:entries="@array/pref_sync_interval"
+            android:entryValues="@array/pref_sync_map"
+            android:defaultValue="@string/pref_sync_manual"
+            android:summary="%s" />
+        />
+
+        <EditTextPreference
+            android:key="goal"
+            android:title="@string/pref_goal"
+            android:dialogTitle="@string/pref_goal_dialog"
+            android:inputType="number"
+            />
     </PreferenceCategory>
 </PreferenceScreen>

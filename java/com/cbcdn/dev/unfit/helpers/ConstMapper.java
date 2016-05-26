@@ -162,7 +162,7 @@ public final class ConstMapper {
             @Override
             public String interpret(byte[] data) {
                 ByteBuffer bb = ByteBuffer.wrap(data);
-                return bb.getInt() + " Steps";
+                return bb.getInt() + " steps";
             }
         },
         ACTIVITY(Service.MILI, "Activity?", "0000ff07-0000-1000-8000-00805f9b34fb"),

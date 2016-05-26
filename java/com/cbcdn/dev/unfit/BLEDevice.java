@@ -13,6 +13,9 @@ import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Service;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -169,6 +172,28 @@ public class BLEDevice {
 
     public BLEDevice(BluetoothDevice device){
         this.device = device;
+    }
+
+    public void updateFirmware(Context context){
+        //This is horribly inefficient, but since InputStream does not provide a length,
+        //we'll do it the hard way
+        List<Byte> fwData = new ArrayList<>();
+
+        try{
+            InputStream fwStream = context.getAssets().open("mi1s.fw");
+
+            for(int data = fwStream.read(); data >= 0; data = fwStream.read()){
+                fwData.add(new Byte((byte)data));
+            }
+
+            fwStream.close();
+        }
+        catch(IOException e){
+            Log.e("BLE firmware update", "Failed to read firmware asset: " + e.getMessage());
+        }
+
+        Log.d("BLE firmware update", "Read " + fwData.size() + " bytes of firmware data");
+        //TODO verify and write firmare
     }
 
     public void dumpEndpoints(){

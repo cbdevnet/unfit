@@ -12,10 +12,10 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Run GATT Dump"
+        android:text="Run firmware update"
         android:id="@+id/button2"
         android:layout_centerHorizontal="true"
-        android:onClick="runGATTDump" />
+        android:onClick="runFirmwareUpdate" />
 
     <Button
         android:layout_width="wrap_content"

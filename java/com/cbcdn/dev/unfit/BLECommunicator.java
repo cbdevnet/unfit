@@ -56,8 +56,15 @@ public class BLECommunicator extends Service {
                 case "com.cbcdn.dev.unfit.request.heartrate":
                     break;
                 case "com.cbcdn.dev.unfit.reconnect":
-                    for(BLEDevice device : devices.values()){
+                    Log.d("BLE service", "Trying to reconnect to device");
+                    for(BLEDevice device : devices.values()) {
                         device.connect(self);
+                    }
+                    break;
+                case "com.cbcdn.dev.unfit.update_firmware":
+                    Log.d("BLE service", "Initiating firmware update");
+                    for(BLEDevice device : devices.values()) {
+                        device.updateFirmware(self);
                     }
                     break;
             }
@@ -79,6 +86,7 @@ public class BLECommunicator extends Service {
         filter.addAction("com.cbcdn.dev.unfit.reconnect");
         filter.addAction("com.cbcdn.dev.unfit.request.gather");
         filter.addAction("com.cbcdn.dev.unfit.request.heartrate");
+        filter.addAction("com.cbcdn.dev.unfit.update_firmware");
         registerReceiver(receiver, filter);
     }
 

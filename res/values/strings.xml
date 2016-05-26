@@ -37,7 +37,7 @@
     <string name="pref_wifi">Sync mode</string>
     <string name="pref_sync_wifi">Sync only on WiFi connection</string>
     <string name="pref_sync_any">Sync on any connection</string>
-    <string name="pref_sync_manual">Manual sync only</string>
+    <string name="pref_sync_manual">Manual only</string>
     <string name="pref_sync_1h">Every hour</string>
     <string name="pref_sync_2h">Every 2 hours</string>
     <string name="pref_sync_6h">Every 6 hours</string>
@@ -45,8 +45,8 @@
     <string name="pref_sync_day">Once per day</string>
     <string name="pref_sync_interval_dialog">How often to try to upload data</string>
     <string name="pref_sync_interval">Synchronization retry interval</string>
-    <string name="pref_data_interval">Device read interval</string>
-    <string name="pref_data_interval_dialog">How often to read data from the device</string>
+    <string name="pref_data_interval">Passive data interval</string>
+    <string name="pref_data_interval_dialog">How often to read passive data from the device</string>
     <string name="pref_user">Synchronization user</string>
     <string name="pref_user_dialog">Username to use for synchronization</string>
     <string name="pref_password">Synchronization password</string>
@@ -54,4 +54,11 @@
     <string name="manual_sync">Synchronize now</string>
     <string name="scan_devices">Scan for devices</string>
     <string name="manage_devices">Device management</string>
+    <string name="pref_goal">Step count goal</string>
+    <string name="pref_goal_dialog">Enter step count goal</string>
+    <string name="pref_call">Vibrate upon incoming call</string>
+    <string name="pref_call_on">Vibrate when called</string>
+    <string name="pref_call_off">Do not vibrate when called</string>
+    <string name="pref_hr_interval">Heartrate measurement interval</string>
+    <string name="pref_hr_interval_dialog">How often to request a heart rate scan</string>
 </resources>
