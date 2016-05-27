@@ -54,6 +54,16 @@ public class PairActivity extends Activity {
         }
     };
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(currentlyScanning){
+            Log.w("Scanner", "Scanning stopped due to activity end");
+            BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner().stopScan(deviceDetected);
+            currentlyScanning = false;
+        }
+    }
+
     public void scanForDevices(View v){
         scanList.clear();
 
@@ -65,12 +75,14 @@ public class PairActivity extends Activity {
                 new ContextRunnable(this) {
                     @Override
                     public void run() {
-                        BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner().stopScan(deviceDetected);
-                        currentlyScanning = false;
-                        BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner().flushPendingScanResults(deviceDetected);
-                        ((Activity)passedContext).findViewById(R.id.scanningSpinner).setVisibility(View.INVISIBLE);
-                        ((Activity)passedContext).findViewById(R.id.scanDevices).setVisibility(View.VISIBLE);
-                        Log.d("Scanner", "Scan stopped with timeout");
+                        if(currentlyScanning) {
+                            BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner().stopScan(deviceDetected);
+                            currentlyScanning = false;
+                            BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner().flushPendingScanResults(deviceDetected);
+                            ((Activity) passedContext).findViewById(R.id.scanningSpinner).setVisibility(View.INVISIBLE);
+                            ((Activity) passedContext).findViewById(R.id.scanDevices).setVisibility(View.VISIBLE);
+                            Log.d("Scanner", "Scan stopped with timeout");
+                        }
                     }
                 }, SCAN_PERIOD);
 

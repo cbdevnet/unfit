@@ -8,14 +8,14 @@ public class DatabaseManager extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     private static final String createDeviceTable = "CREATE TABLE devices ( " +
-            "    mac    TEXT    PRIMARY KEY" +
-            "                   NOT NULL" +
-            "                   UNIQUE," +
-            "    is_def BOOLEAN NOT NULL" +
-            "                   DEFAULT ( 0 ) " +
+            "    device     INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE," +
+            "    mac    TEXT    NOT NULL" +
+            "                   UNIQUE" +
             ");";
 
     private static final String createReadingTable = "CREATE TABLE readings ( " +
+            "    device    INTEGER NOT NULL REFERENCES devices (id) " +
+            "                      ON UPDATE CASCADE ON DELETE CASCADE," +
             "    uuid      TEXT    NOT NULL," +
             "    timestamp INTEGER NOT NULL" +
             "                      DEFAULT ( strftime( '%s', 'now' )  )," +
