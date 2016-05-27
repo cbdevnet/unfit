@@ -44,4 +44,22 @@
         android:layout_centerHorizontal="true"
         android:onClick="toggleVibration" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Run Pairing CB"
+        android:id="@+id/button"
+        android:layout_below="@+id/button5"
+        android:layout_centerHorizontal="true"
+        android:onClick="runPairing" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Write user data"
+        android:id="@+id/button6"
+        android:layout_below="@+id/button"
+        android:layout_centerHorizontal="true"
+        android:onClick="writeUserData" />
+
 </RelativeLayout>

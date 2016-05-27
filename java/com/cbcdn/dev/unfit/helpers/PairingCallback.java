@@ -34,11 +34,12 @@ public class PairingCallback extends BLECallback {
         }
         switch(pairState){
             case STARTED:
-                if(data[0] == 0xFF){
+                if(data[0] == (byte)0xFF){
                     Log.d("PairingCallback", "Unpaired device detected, writing pair command");
                     self.requestPriorityWrite(Characteristic.PAIR, Command.PAIR.getCommand(), this);
                     return;
                 }
+                Log.d("PairingCallback", "Device seems paired, " + String.format("%02X", data[0]));
                 break;
             case CHECK:
                 if(data[0] == 0x2){

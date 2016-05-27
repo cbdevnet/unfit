@@ -1,6 +1,8 @@
 package com.cbcdn.dev.unfit.helpers;
 
 import android.bluetooth.BluetoothProfile;
+import android.content.SharedPreferences;
+
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -153,7 +155,28 @@ public final class ConstMapper {
             }
         },
         NOTIFICATION(Service.MILI, "Notification?", "0000ff03-0000-1000-8000-00805f9b34fb"),
-        USER_INFO(Service.MILI, "User info", "0000ff04-0000-1000-8000-00805f9b34fb"),
+        USER_INFO(Service.MILI, "User info", "0000ff04-0000-1000-8000-00805f9b34fb"){
+            public byte[] generateStream(String mac, SharedPreferences prefs){
+
+                ByteBuffer data = ByteBuffer.allocate(20);
+
+                data.putInt(0xDEADBEEF);
+                data.put(Byte.parseByte(prefs.getString("gender", "0")));
+                data.put(Byte.parseByte(prefs.getString("age", "0")));
+                //FIXME these are ugly because Java is really picky about bytes
+                data.put((byte)(Integer.parseInt(prefs.getString("height", "0")) & 0xFF));
+                data.put((byte)(Integer.parseInt(prefs.getString("weight", "0")) & 0xFF));
+                data.put((byte)0);
+                data.put((byte)4);
+                data.put((byte)0);
+                data.put("cbdevrox".getBytes());
+
+                //TODO calculate the checksum
+                data.put((byte)0);
+
+                return data.array();
+            }
+        },
         CONTROL(Service.MILI, "Control", "0000ff05-0000-1000-8000-00805f9b34fb"),
         REALTIME_STEPS(Service.MILI, "Realtime steps", "0000ff06-0000-1000-8000-00805f9b34fb"){
             @Override
@@ -190,18 +213,18 @@ public final class ConstMapper {
         PAIR(Service.MILI, "Pairing", "0000ff0f-0000-1000-8000-00805f9b34fb"){
             @Override
             public String interpret(byte[] data) {
-                switch(data.length){
-                    case 1:
-                    case 2:
-                        if(data[0] == 2){
-                            return "Paired";
-                        }
-                        if(data[0] == 0xFF){
-                            return "Not paired";
-                        }
-                    default:
-                        return "Invalid pairing data";
+                if(data.length < 1) {
+                    return "Invalid pairing data length";
                 }
+
+                if(data[0] == 2){
+                    return "Paired";
+                }
+                if(data[0] == (byte)0xFF){
+                    return "Not paired";
+                }
+
+                return "Unknown pairing data value";
             }
         },
 
@@ -235,6 +258,10 @@ public final class ConstMapper {
 
         public String interpret(byte[] data){
             return "not implemented";
+        }
+
+        public byte[] generateStream(String mac, SharedPreferences prefs){
+            return null;
         }
 
         public UUID getUUID(){

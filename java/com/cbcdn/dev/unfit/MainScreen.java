@@ -18,6 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.cbcdn.dev.unfit.helpers.ConstMapper;
+
 public class MainScreen extends Activity {
     public final static int REQUEST_MAC = 1;
     public final static int REQUEST_CONFIG = 2;
@@ -44,7 +46,12 @@ public class MainScreen extends Activity {
                 catch(SQLiteConstraintException e){
                     Toast.makeText(this, "Failed to store device address, probably already paired", Toast.LENGTH_SHORT).show();
                 }
+
                 startActivity(new Intent(this, SettingsActivity.class).putExtra("MAC", currentMAC));
+            }
+            else if(currentMAC == null){
+                Toast.makeText(this, "Need a device to work with", Toast.LENGTH_SHORT).show();
+                finish();
             }
         }
     }
@@ -65,7 +72,7 @@ public class MainScreen extends Activity {
 
     public void runFirmwareUpdate(View v){
         if(serviceBinder != null){
-            serviceBinder.updateFirmare();
+            serviceBinder.updateFirmware();
         }
     }
 
@@ -81,8 +88,25 @@ public class MainScreen extends Activity {
 
     public void toggleVibration(View v){
         if(serviceBinder != null){
-            serviceBinder.startVibration();
+            serviceBinder.startVibration(currentMAC);
         }
+    }
+
+    public void runPairing(View v){
+        if(serviceBinder != null){
+            serviceBinder.pairDevice(currentMAC);
+        }
+    }
+
+    public void writeUserData(View v){
+        byte[] data = ConstMapper.Characteristic.USER_INFO.generateStream(currentMAC, PreferenceManager.getDefaultSharedPreferences(this));
+
+        StringBuilder dataDump = new StringBuilder("Generated user data of length " + data.length + ": ");
+        for(int i = 0; i < data.length; i++){
+            dataDump.append(String.format("%02X", data[i]));
+        }
+
+        Log.d("MainScreen", dataDump.toString());
     }
 
     @Override
@@ -167,7 +191,7 @@ public class MainScreen extends Activity {
                 return false;
             case R.id.reconnect:
                 if(serviceBinder != null){
-                    serviceBinder.reconnectDevice();
+                    serviceBinder.reconnectDevice(currentMAC);
                     return true;
                 }
                 return false;

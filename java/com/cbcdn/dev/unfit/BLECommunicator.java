@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
+import com.cbcdn.dev.unfit.helpers.PairingCallback;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,16 +25,18 @@ public class BLECommunicator extends Service {
     private CommunicatorBinder binder = new CommunicatorBinder();
 
     public class CommunicatorBinder extends Binder {
-        public void startVibration(){
-            Log.d("BLE service", "Starting vibration");
-            for(BLEDevice device : devices.values()){
+        public void startVibration(String mac){
+            BLEDevice device = devices.get(mac);
+            if(device != null){
+                Log.d("BLE service", "Starting vibration");
                 device.requestWrite(Characteristic.VIBRATION, Command.VIBRATE2.getCommand());
             }
         }
 
-        public void stopVibration(){
-            Log.d("BLE service", "Stopping vibration");
-            for(BLEDevice device : devices.values()){
+        public void stopVibration(String mac){
+            BLEDevice device = devices.get(mac);
+            if(device != null){
+                Log.d("BLE service", "Stopping vibration");
                 device.requestWrite(Characteristic.VIBRATION, Command.VIBRATION_STOP.getCommand());
             }
         }
@@ -52,17 +55,29 @@ public class BLECommunicator extends Service {
             }
         }
 
-        public void reconnectDevice(){
-            Log.d("BLE service", "Trying to reconnect to device");
-            for(BLEDevice device : devices.values()) {
+        public void reconnectDevice(String mac){
+            BLEDevice device = devices.get(mac);
+            if(device != null){
+                Log.d("BLE service", "Trying to reconnect to device " + mac);
                 device.connect(self);
             }
         }
 
-        public void updateFirmare(){
+        public void updateFirmware(){
             Log.d("BLE service", "Initiating firmware update");
             for(BLEDevice device : devices.values()) {
                 device.updateFirmware(self);
+            }
+        }
+
+        public void pairDevice(String mac){
+            BLEDevice device = devices.get(mac);
+            if(device != null){
+                Log.d("BLE service", "Trying to pair device " + mac);
+                device.requestPriorityRead(Characteristic.PAIR, new PairingCallback());
+            }
+            else{
+                Log.e("BLE service", "Device " + mac + " not known to service");
             }
         }
     }
