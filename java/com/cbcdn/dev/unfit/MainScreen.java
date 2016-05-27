@@ -1,8 +1,12 @@
 package com.cbcdn.dev.unfit;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -13,8 +17,8 @@ public class MainScreen extends Activity {
     public final static int REQUEST_MAC = 1;
     public final static int REQUEST_CONFIG = 2;
     private DatabaseManager db;
-    private boolean vibrating = false;
     private String currentMAC;
+    private BLECommunicator.CommunicatorBinder serviceBinder = null;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -31,8 +35,24 @@ public class MainScreen extends Activity {
         }
     }
 
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d("MainScreen", "Communicator service bound");
+            serviceBinder = (BLECommunicator.CommunicatorBinder) service;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+            Log.d("MainScreen", "Communicator service detached");
+            serviceBinder = null;
+        }
+    };
+
     public void runFirmwareUpdate(View v){
-        this.sendBroadcast(new Intent().setAction("com.cbcdn.dev.unfit.update_firmware"));
+        if(serviceBinder != null){
+            serviceBinder.updateFirmare();
+        }
     }
 
     public void startService(View v){
@@ -40,17 +60,29 @@ public class MainScreen extends Activity {
     }
 
     public void testBand(View v){
-        this.sendBroadcast(new Intent().setAction("com.cbcdn.dev.unfit.selftest"));
+        if(serviceBinder != null){
+            serviceBinder.deviceSelftest();
+        }
     }
 
     public void toggleVibration(View v){
-        if(vibrating){
-            this.sendBroadcast(new Intent().setAction("com.cbcdn.dev.unfit.vibration.stop"));
+        if(serviceBinder != null){
+            serviceBinder.startVibration();
         }
-        else{
-            this.sendBroadcast(new Intent().setAction("com.cbcdn.dev.unfit.vibration.start"));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bindService(new Intent(this, BLECommunicator.class), serviceConnection, Context.BIND_AUTO_CREATE | Context.BIND_IMPORTANT);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(serviceBinder != null){
+            unbindService(serviceConnection);
         }
-        //vibrating = !vibrating;
     }
 
     @Override
@@ -94,11 +126,17 @@ public class MainScreen extends Activity {
                 startActivity(new Intent(this, SettingsActivity.class).putExtra("MAC", currentMAC));
                 return true;
             case R.id.fetch:
-                this.sendBroadcast(new Intent().setAction("com.cbcdn.dev.unfit.request.gather").putExtra("MAC", currentMAC));
-                return true;
+                if(serviceBinder != null){
+                    serviceBinder.gatherPassive();
+                    return true;
+                }
+                return false;
             case R.id.reconnect:
-                this.sendBroadcast(new Intent().setAction("com.cbcdn.dev.unfit.reconnect").putExtra("MAC", currentMAC));
-                return true;
+                if(serviceBinder != null){
+                    serviceBinder.reconnectDevice();
+                    return true;
+                }
+                return false;
             default:
                 return super.onOptionsItemSelected(item);
         }

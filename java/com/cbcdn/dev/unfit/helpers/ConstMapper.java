@@ -1,9 +1,6 @@
 package com.cbcdn.dev.unfit.helpers;
 
 import android.bluetooth.BluetoothProfile;
-import android.util.Log;
-
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -20,54 +21,58 @@ public class BLECommunicator extends Service {
     private DatabaseManager db;
     private Map<String,BLEDevice> devices = new HashMap<>();
     private BLECommunicator self = this;
+    private CommunicatorBinder binder = new CommunicatorBinder();
+
+    public class CommunicatorBinder extends Binder {
+        public void startVibration(){
+            Log.d("BLE service", "Starting vibration");
+            for(BLEDevice device : devices.values()){
+                device.requestWrite(Characteristic.VIBRATION, Command.VIBRATE2.getCommand());
+            }
+        }
+
+        public void stopVibration(){
+            Log.d("BLE service", "Stopping vibration");
+            for(BLEDevice device : devices.values()){
+                device.requestWrite(Characteristic.VIBRATION, Command.VIBRATION_STOP.getCommand());
+            }
+        }
+
+        public void deviceSelftest(){
+            Log.d("BLE service", "Self-testing all devices");
+            for(BLEDevice device : devices.values()){
+                device.requestWrite(Characteristic.TEST, Command.SELF_TEST.getCommand());
+            }
+        }
+
+        public void gatherPassive(){
+            Log.d("BLE service", "Gathering passive data");
+            for(BLEDevice device : devices.values()){
+                device.requestPassiveDataRead();
+            }
+        }
+
+        public void reconnectDevice(){
+            Log.d("BLE service", "Trying to reconnect to device");
+            for(BLEDevice device : devices.values()) {
+                device.connect(self);
+            }
+        }
+
+        public void updateFirmare(){
+            Log.d("BLE service", "Initiating firmware update");
+            for(BLEDevice device : devices.values()) {
+                device.updateFirmware(self);
+            }
+        }
+    }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("BLE service", "Received intent: " + intent.getAction());
-            switch(intent.getAction()){
-                //case "android.provider.Telephony.SMS_RECEIVED":
-                //    break;
-                case "com.cbcdn.dev.unfit.vibration.start":
-                    Log.d("BLE service", "Starting vibration");
-                    for(BLEDevice device : devices.values()){
-                        device.requestWrite(Characteristic.VIBRATION, Command.VIBRATE2.getCommand());
-                        //device.requestWrite(Characteristic.CONTROL_POINT, Command.TEST_COMMAND.getCommand());
-                    }
-                    break;
-                case "com.cbcdn.dev.unfit.vibration.stop":
-                    Log.d("BLE service", "Stopping vibration");
-                    for(BLEDevice device : devices.values()){
-                        device.requestWrite(Characteristic.VIBRATION, Command.VIBRATION_STOP.getCommand());
-                    }
-                    break;
-                case "com.cbcdn.dev.unfit.selftest":
-                    Log.d("BLE service", "Self-testing all devices");
-                    for(BLEDevice device : devices.values()){
-                        device.requestWrite(Characteristic.TEST, Command.SELF_TEST.getCommand());
-                    }
-                    break;
-                case "com.cbcdn.dev.unfit.request.gather":
-                    Log.d("BLE service", "Gathering passive data");
-                    for(BLEDevice device : devices.values()){
-                        device.requestPassiveDataRead();
-                    }
-                    break;
-                case "com.cbcdn.dev.unfit.request.heartrate":
-                    break;
-                case "com.cbcdn.dev.unfit.reconnect":
-                    Log.d("BLE service", "Trying to reconnect to device");
-                    for(BLEDevice device : devices.values()) {
-                        device.connect(self);
-                    }
-                    break;
-                case "com.cbcdn.dev.unfit.update_firmware":
-                    Log.d("BLE service", "Initiating firmware update");
-                    for(BLEDevice device : devices.values()) {
-                        device.updateFirmware(self);
-                    }
-                    break;
-            }
+            //switch(intent.getAction()){
+            //}
         }
     };
 
@@ -80,13 +85,7 @@ public class BLECommunicator extends Service {
         db = new DatabaseManager(this);
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction("com.cbcdn.dev.unfit.vibration.start");
-        filter.addAction("com.cbcdn.dev.unfit.vibration.stop");
-        filter.addAction("com.cbcdn.dev.unfit.selftest");
-        filter.addAction("com.cbcdn.dev.unfit.reconnect");
-        filter.addAction("com.cbcdn.dev.unfit.request.gather");
-        filter.addAction("com.cbcdn.dev.unfit.request.heartrate");
-        filter.addAction("com.cbcdn.dev.unfit.update_firmware");
+        filter.addAction("com.android.deskclock.ALARM_ALERT");
         registerReceiver(receiver, filter);
     }
 
@@ -112,7 +111,6 @@ public class BLECommunicator extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        //TODO service binding
-        return null;
+        return binder;
     }
 }

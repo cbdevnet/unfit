@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
 
+import com.cbcdn.dev.unfit.helpers.BLECallback;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Service;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
@@ -37,10 +38,21 @@ public class BLEDevice {
         private Characteristic characteristic;
         private boolean write = false;
         private byte[] data;
+        private BLECallback callback;
         public boolean inProgress = false;
+
+        public RWQEntry(Characteristic characteristic, BLECallback callback){
+            this(characteristic);
+            this.callback = callback;
+        }
 
         public RWQEntry(Characteristic characteristic){
             this.characteristic = characteristic;
+        }
+
+        public RWQEntry(Characteristic characteristic, byte[] data, BLECallback callback){
+            this(characteristic, data);
+            this.callback = callback;
         }
 
         public RWQEntry(Characteristic characteristic, byte[] data){
@@ -51,6 +63,17 @@ public class BLEDevice {
 
         public boolean matches(Characteristic characteristic, boolean write){
             return this.characteristic == characteristic && this.write == write;
+        }
+
+        public void dispatch(int status, byte[] data){
+            if(callback != null){
+                if(write){
+                    callback.writeCompleted(self, characteristic, status);
+                }
+                else{
+                    callback.readCompleted(self, characteristic, status, data);
+                }
+            }
         }
 
         public void perform(){
@@ -65,7 +88,7 @@ public class BLEDevice {
     }
 
     private List<RWQEntry> gattQueue = new LinkedList<>();
-
+    private List<BLECallback> notificationListeners = new LinkedList<>();
     private BluetoothGattCallback callback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -100,9 +123,13 @@ public class BLEDevice {
 
             RWQEntry head = gattQueue.size() > 0 ? gattQueue.get(0) : null;
             if(head != null && head.inProgress && head.matches(Characteristic.fromUUID(characteristic.getUuid()), true)){
+                //The ordering of remove and dispatch is important, because callbacks may re-enqueue themselves
                 gattQueue.remove(0);
-                //TODO might call callback here
+                head.dispatch(status, characteristic.getValue());
                 workQueue();
+            }
+            else{
+                Log.e("BLE queue", "Invalid state: head not workable");
             }
         }
 
@@ -123,8 +150,11 @@ public class BLEDevice {
                 RWQEntry head = gattQueue.size() > 0 ? gattQueue.get(0) : null;
                 if (head != null && head.inProgress && head.matches(Characteristic.fromUUID(characteristic.getUuid()), false)) {
                     gattQueue.remove(0);
-                    //TODO might call callback here
+                    head.dispatch(status, characteristic.getValue());
                     workQueue();
+                }
+                else{
+                    Log.e("BLE queue", "Invalid state: head not workable");
                 }
             }
         }
@@ -198,7 +228,7 @@ public class BLEDevice {
 
     public void dumpEndpoints(){
         if(gatt != null){
-            Log.d("BLE Dump", "Invoked on " + gatt.toString() + " " + device.getAddress());
+            Log.d("BLE Dump", "Invoked on " + device.getAddress());
 
             for(BluetoothGattService service : gatt.getServices()){
                 Log.d("BLE Dump", "Service " +
@@ -238,6 +268,19 @@ public class BLEDevice {
                 && this.requestRead(Characteristic.STATISTICS);
     }
 
+    public boolean requestPriorityRead(Characteristic characteristic, BLECallback callback){
+        if(state != BTLEState.CONNECTED){
+            Log.d("BLE read", "Device not connected");
+            return false;
+        }
+
+        //TODO check for discovered services
+        Log.d("BLE Queue", "Enqueueing priority read for " + characteristic);
+        gattQueue.add(0, new RWQEntry(characteristic, callback));
+        workQueue();
+        return true;
+    }
+
     public boolean requestRead(Characteristic characteristic){
         if(state != BTLEState.CONNECTED){
             Log.d("BLE read", "Device not connected");
@@ -247,6 +290,19 @@ public class BLEDevice {
         //TODO check for discovered services
         Log.d("BLE Queue", "Enqueueing read for " + characteristic);
         gattQueue.add(new RWQEntry(characteristic));
+        workQueue();
+        return true;
+    }
+
+    public boolean requestPriorityWrite(Characteristic characteristic, byte[] data, BLECallback callback){
+        if(state != BTLEState.CONNECTED){
+            Log.d("BLE read", "Device not connected");
+            return false;
+        }
+
+        //TODO check for discovered services
+        Log.d("BLE Queue", "Enqueueing priority write for " + characteristic);
+        gattQueue.add(0, new RWQEntry(characteristic, data, callback));
         workQueue();
         return true;
     }
