@@ -11,7 +11,9 @@ public class SyncCallback extends BLECallback {
     private enum SyncState {
         STARTED,
         USER_DATA,
-        WEAR_LOCATION;
+        WEAR_LOCATION,
+        GOAL,
+        TIME;
     }
 
     private SyncState syncState = SyncState.STARTED;
@@ -35,6 +37,29 @@ public class SyncCallback extends BLECallback {
                 if(status == BluetoothGatt.GATT_SUCCESS){
                     Log.d("SyncCallback", "User info written, writing wear location");
                     this.syncState = SyncState.WEAR_LOCATION;
+                    self.requestPriorityWrite(Command.SET_LOCATION, this, this.preferences);
+                    return;
+                }
+                break;
+            case WEAR_LOCATION:
+                if(status == BluetoothGatt.GATT_SUCCESS){
+                    Log.d("SyncCallback", "Wear location written, writing step goal");
+                    this.syncState = SyncState.GOAL;
+                    self.requestPriorityWrite(Command.SET_GOAL, this, this.preferences);
+                    return;
+                }
+                break;
+            case GOAL:
+                if(status == BluetoothGatt.GATT_SUCCESS){
+                    Log.d("SyncCallback", "Step goal written, writing time");
+                    this.syncState = SyncState.TIME;
+                    self.requestPriorityWrite(Command.SET_TIME, this, this.preferences);
+                    return;
+                }
+            case TIME:
+                if(status == BluetoothGatt.GATT_SUCCESS){
+                    Log.d("SyncCallback", "Band synchronized, job done");
+                    chain(self);
                     return;
                 }
                 break;

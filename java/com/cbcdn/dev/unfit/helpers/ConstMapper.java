@@ -3,6 +3,7 @@ package com.cbcdn.dev.unfit.helpers;
 import android.bluetooth.BluetoothProfile;
 import android.content.SharedPreferences;
 import java.nio.ByteBuffer;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -13,6 +14,7 @@ public final class ConstMapper {
     }
 
     public enum ChargeState {
+        UNKNOWN(0, "Unknown state"), //encountered after reboot
         CHARGING_LOW(1, "Charging (low)"),
         CHARGING_MEDIUM(2, "Charging (medium)"),
         CHARGING_FULL(3, "Charging (full)"),
@@ -154,20 +156,58 @@ public final class ConstMapper {
                 return new String(data);
             }
         },
-        NOTIFICATION(Service.MILI, "Notification?", "0000ff03-0000-1000-8000-00805f9b34fb"),
+        NOTIFICATION(Service.MILI, "Notification", "0000ff03-0000-1000-8000-00805f9b34fb"){
+            @Override
+            public String interpret(byte[] data) {
+                if(data.length > 0) {
+                    switch (data[0]) {
+                        case 5:
+                            return "Authentication OK";
+                    }
+                }
+                else{
+                    return "Zero length";
+                }
+
+                return "Unknown notification byte";
+            }
+        },
         USER_INFO(Service.MILI, "User info", "0000ff04-0000-1000-8000-00805f9b34fb"),
         CONTROL(Service.MILI, "Control", "0000ff05-0000-1000-8000-00805f9b34fb"),
         REALTIME_STEPS(Service.MILI, "Realtime steps", "0000ff06-0000-1000-8000-00805f9b34fb"){
             @Override
             public String interpret(byte[] data) {
                 ByteBuffer bb = ByteBuffer.wrap(data);
-                return bb.getInt() + " steps";
+                return Integer.reverseBytes(bb.getInt()) + " steps";
             }
         },
         ACTIVITY(Service.MILI, "Activity?", "0000ff07-0000-1000-8000-00805f9b34fb"),
         FIRMWARE(Service.MILI, "Firmware data", "0000ff08-0000-1000-8000-00805f9b34fb"),
         BLE_PARAMS(Service.MILI, "BLE parameters", "0000ff09-0000-1000-8000-00805f9b34fb"),
-        TIME(Service.MILI, "Time", "0000ff0a-0000-1000-8000-00805f9b34fb"),
+        TIME(Service.MILI, "Time", "0000ff0a-0000-1000-8000-00805f9b34fb"){
+            @Override
+            public String interpret(byte[] data) {
+                if(data.length != 12){
+                    return "Invalid time data length";
+                }
+
+                StringBuilder rv = new StringBuilder();
+
+                for(int date = 0; date < 2; date++) {
+                    rv.append(" Date #" + (date + 1) + " ");
+
+                    rv.append((data[(date * 6) + 0] + 2000) + "-");
+                    rv.append((data[(date * 6) + 1]) + "-");
+                    rv.append((data[(date * 6) + 2]) + " ");
+
+                    rv.append((data[(date * 6) + 3]) + ":");
+                    rv.append((data[(date * 6) + 4]) + ":");
+                    rv.append((data[(date * 6) + 5]));
+                }
+
+                return rv.toString();
+            }
+        },
         STATISTICS(Service.MILI, "Statistics", "0000ff0b-0000-1000-8000-00805f9b34fb"),
         BATTERY(Service.MILI, "Battery", "0000ff0c-0000-1000-8000-00805f9b34fb"){
             @Override
@@ -272,6 +312,41 @@ public final class ConstMapper {
         VIBRATE2_LED(Characteristic.VIBRATION, new byte[]{1}),
         VIBRATION_STOP(Characteristic.VIBRATION, new byte[]{0}),
 
+        SET_GOAL(Characteristic.CONTROL, new byte[]{5, 0}){
+            @Override
+            public byte[] getCommand(String mac, SharedPreferences preferences) throws InvalidPreferencesFormatException {
+                if(!preferences.contains("goal")){
+                    throw new InvalidPreferencesFormatException("Missing goal preference");
+                }
+
+                ByteBuffer command = ByteBuffer.allocate(4);
+                command.put(this.command);
+                command.putShort(Short.reverseBytes(Short.parseShort(preferences.getString("goal", "5000"))));
+
+                return command.array();
+            }
+        },
+        SET_TIME(Characteristic.TIME, null){
+            @Override
+            public byte[] getCommand(String mac, SharedPreferences preferences) throws InvalidPreferencesFormatException {
+                ByteBuffer data = ByteBuffer.allocate(12);
+                Calendar calendar = Calendar.getInstance();
+
+                data.put((byte) (calendar.get(Calendar.YEAR) - 2000));
+                data.put((byte) calendar.get(Calendar.MONTH));
+                data.put((byte) calendar.get(Calendar.DATE));
+
+                data.put((byte) calendar.get(Calendar.HOUR_OF_DAY));
+                data.put((byte) calendar.get(Calendar.MINUTE));
+                data.put((byte) calendar.get(Calendar.SECOND));
+
+                data.putShort((short) 0x0F0F);
+                data.putShort((short) 0x0F0F);
+                data.putShort((short) 0x0F0F);
+
+                return data.array();
+            }
+        },
         SET_LOCATION(Characteristic.CONTROL, new byte[]{15}){
             @Override
             public byte[] getCommand(String mac, SharedPreferences preferences) {
@@ -330,7 +405,8 @@ public final class ConstMapper {
 
                 return crc;
             }
-        };
+        },
+        REBOOT(Characteristic.CONTROL, new byte[]{12});
 
         protected byte[] command;
         private Characteristic endpoint;

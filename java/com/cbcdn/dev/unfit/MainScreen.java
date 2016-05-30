@@ -101,6 +101,12 @@ public class MainScreen extends Activity {
         }
     }
 
+    public void doThings(View v){
+        if(serviceBinder != null){
+            serviceBinder.rebootBand(currentMAC);
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();

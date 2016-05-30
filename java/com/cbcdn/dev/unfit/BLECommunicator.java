@@ -89,6 +89,14 @@ public class BLECommunicator extends Service {
                 new SyncCallback(PreferenceManager.getDefaultSharedPreferences(self)).start(device);
             }
         }
+
+        public void rebootBand(String mac){
+            BLEDevice device = devices.get(mac);
+            if(device != null){
+                Log.d("BLE service", "Rebooting device " + mac);
+                device.requestWrite(Command.REBOOT, null);
+            }
+        }
     }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
