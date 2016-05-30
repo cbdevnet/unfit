@@ -61,4 +61,6 @@
     <string name="pref_call_off">Do not vibrate when called</string>
     <string name="pref_hr_interval">Heartrate measurement interval</string>
     <string name="pref_hr_interval_dialog">How often to request a heart rate scan</string>
+    <string name="pref_name">Device name</string>
+    <string name="pref_name_dialog">Set a device name</string>
 </resources>

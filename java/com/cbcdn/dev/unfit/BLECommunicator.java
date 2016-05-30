@@ -6,14 +6,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Binder;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
-
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
-import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 import com.cbcdn.dev.unfit.helpers.PairingCallback;
+import com.cbcdn.dev.unfit.helpers.SyncCallback;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class BLECommunicator extends Service {
             BLEDevice device = devices.get(mac);
             if(device != null){
                 Log.d("BLE service", "Starting vibration");
-                device.requestWrite(Characteristic.VIBRATION, Command.VIBRATE2.getCommand());
+                device.requestWrite(Command.VIBRATE2, null);
             }
         }
 
@@ -37,14 +38,14 @@ public class BLECommunicator extends Service {
             BLEDevice device = devices.get(mac);
             if(device != null){
                 Log.d("BLE service", "Stopping vibration");
-                device.requestWrite(Characteristic.VIBRATION, Command.VIBRATION_STOP.getCommand());
+                device.requestWrite(Command.VIBRATION_STOP, null);
             }
         }
 
         public void deviceSelftest(){
             Log.d("BLE service", "Self-testing all devices");
             for(BLEDevice device : devices.values()){
-                device.requestWrite(Characteristic.TEST, Command.SELF_TEST.getCommand());
+                device.requestWrite(Command.SELF_TEST, null);
             }
         }
 
@@ -74,10 +75,18 @@ public class BLECommunicator extends Service {
             BLEDevice device = devices.get(mac);
             if(device != null){
                 Log.d("BLE service", "Trying to pair device " + mac);
-                device.requestPriorityRead(Characteristic.PAIR, new PairingCallback());
+                new PairingCallback().start(device);
             }
             else{
                 Log.e("BLE service", "Device " + mac + " not known to service");
+            }
+        }
+
+        public void syncBand(String mac, SharedPreferences preferences){
+            BLEDevice device = devices.get(mac);
+            if(device != null){
+                Log.d("BLE service", "Trying to sync device " + mac);
+                new SyncCallback(PreferenceManager.getDefaultSharedPreferences(self)).start(device);
             }
         }
     }

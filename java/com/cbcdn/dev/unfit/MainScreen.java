@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -17,8 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
-import com.cbcdn.dev.unfit.helpers.ConstMapper;
 
 public class MainScreen extends Activity {
     public final static int REQUEST_MAC = 1;
@@ -99,14 +96,9 @@ public class MainScreen extends Activity {
     }
 
     public void writeUserData(View v){
-        byte[] data = ConstMapper.Characteristic.USER_INFO.generateStream(currentMAC, PreferenceManager.getDefaultSharedPreferences(this));
-
-        StringBuilder dataDump = new StringBuilder("Generated user data of length " + data.length + ": ");
-        for(int i = 0; i < data.length; i++){
-            dataDump.append(String.format("%02X", data[i]));
+        if(serviceBinder != null){
+            serviceBinder.syncBand(currentMAC, PreferenceManager.getDefaultSharedPreferences(this));
         }
-
-        Log.d("MainScreen", dataDump.toString());
     }
 
     @Override

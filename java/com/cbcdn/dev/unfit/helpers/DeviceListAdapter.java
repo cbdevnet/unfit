@@ -11,9 +11,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
-
 import com.cbcdn.dev.unfit.R;
-
 import java.util.LinkedList;
 import java.util.List;
 

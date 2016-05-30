@@ -7,18 +7,19 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
-
 import com.cbcdn.dev.unfit.helpers.BLECallback;
+import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Service;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.prefs.InvalidPreferencesFormatException;
 
 public class BLEDevice {
     private static String dumpBytes(byte[] data){
@@ -294,7 +295,16 @@ public class BLEDevice {
         return true;
     }
 
-    public boolean requestPriorityWrite(Characteristic characteristic, byte[] data, BLECallback callback){
+    public boolean requestPriorityWrite(Command command, BLECallback callback, SharedPreferences preferences){
+        try{
+            return this.requestPriorityWrite(command.getEndpoint(), command.getCommand(this.device.getAddress(), preferences), callback);
+        }
+        catch(InvalidPreferencesFormatException e){
+            return false;
+        }
+    }
+
+    private boolean requestPriorityWrite(Characteristic characteristic, byte[] data, BLECallback callback){
         if(state != BTLEState.CONNECTED){
             Log.d("BLE read", "Device not connected");
             return false;
@@ -307,7 +317,16 @@ public class BLEDevice {
         return true;
     }
 
-    public boolean requestWrite(Characteristic characteristic, byte[] data){
+    public boolean requestWrite(Command command, SharedPreferences preferences){
+        try {
+            return requestWrite(command.getEndpoint(), command.getCommand(this.device.getAddress(), preferences));
+        }
+        catch(InvalidPreferencesFormatException e){
+            return false;
+        }
+    }
+
+    private boolean requestWrite(Characteristic characteristic, byte[] data){
         if(state != BTLEState.CONNECTED){
             Log.d("BLE read", "Device not connected");
             return false;

@@ -96,6 +96,13 @@
     <PreferenceCategory
         android:title="@string/misc_settings"
         android:key="misc">
+        <EditTextPreference
+            android:key="name"
+            android:title="@string/pref_name"
+            android:dialogTitle="@string/pref_name_dialog"
+            android:maxLength="8"
+            />
+
         <SwitchPreference
             android:key="alarm_react"
             android:title="@string/pref_alarm"

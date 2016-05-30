@@ -2,11 +2,11 @@ package com.cbcdn.dev.unfit.helpers;
 
 import android.bluetooth.BluetoothProfile;
 import android.content.SharedPreferences;
-
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.prefs.InvalidPreferencesFormatException;
 
 public final class ConstMapper {
     private ConstMapper(){
@@ -155,28 +155,7 @@ public final class ConstMapper {
             }
         },
         NOTIFICATION(Service.MILI, "Notification?", "0000ff03-0000-1000-8000-00805f9b34fb"),
-        USER_INFO(Service.MILI, "User info", "0000ff04-0000-1000-8000-00805f9b34fb"){
-            public byte[] generateStream(String mac, SharedPreferences prefs){
-
-                ByteBuffer data = ByteBuffer.allocate(20);
-
-                data.putInt(0xDEADBEEF);
-                data.put(Byte.parseByte(prefs.getString("gender", "0")));
-                data.put(Byte.parseByte(prefs.getString("age", "0")));
-                //FIXME these are ugly because Java is really picky about bytes
-                data.put((byte)(Integer.parseInt(prefs.getString("height", "0")) & 0xFF));
-                data.put((byte)(Integer.parseInt(prefs.getString("weight", "0")) & 0xFF));
-                data.put((byte)0);
-                data.put((byte)4);
-                data.put((byte)0);
-                data.put("cbdevrox".getBytes());
-
-                //TODO calculate the checksum
-                data.put((byte)0);
-
-                return data.array();
-            }
-        },
+        USER_INFO(Service.MILI, "User info", "0000ff04-0000-1000-8000-00805f9b34fb"),
         CONTROL(Service.MILI, "Control", "0000ff05-0000-1000-8000-00805f9b34fb"),
         REALTIME_STEPS(Service.MILI, "Realtime steps", "0000ff06-0000-1000-8000-00805f9b34fb"){
             @Override
@@ -260,10 +239,6 @@ public final class ConstMapper {
             return "not implemented";
         }
 
-        public byte[] generateStream(String mac, SharedPreferences prefs){
-            return null;
-        }
-
         public UUID getUUID(){
             return uuid;
         }
@@ -289,24 +264,88 @@ public final class ConstMapper {
     }
 
     public enum Command {
-        PAIR(new byte[]{2}),
-        SELF_TEST(new byte[]{2}),
-        VIBRATE2(new byte[]{4}),
-        VIBRATE2_LED2(new byte[]{3}),
-        VIBRATE10_LED(new byte[]{2}),
-        VIBRATE2_LED(new byte[]{1}),
-        VIBRATION_STOP(new byte[]{0}),
+        PAIR(Characteristic.PAIR ,new byte[]{2}),
+        SELF_TEST(Characteristic.TEST, new byte[]{2}),
+        VIBRATE2(Characteristic.VIBRATION, new byte[]{4}),
+        VIBRATE2_LED2(Characteristic.VIBRATION, new byte[]{3}),
+        VIBRATE10_LED(Characteristic.VIBRATION, new byte[]{2}),
+        VIBRATE2_LED(Characteristic.VIBRATION, new byte[]{1}),
+        VIBRATION_STOP(Characteristic.VIBRATION, new byte[]{0}),
 
-        TEST_COMMAND(new byte[]{8, 2});
+        SET_LOCATION(Characteristic.CONTROL, new byte[]{15}){
+            @Override
+            public byte[] getCommand(String mac, SharedPreferences preferences) {
+                return new byte[]{this.command[0], Byte.parseByte(preferences.getString("side", "0"))};
+            }
+        },
 
-        private byte[] command;
+        SET_USER_DATA(Characteristic.USER_INFO, null) {
+            @Override
+            public byte[] getCommand(String mac, SharedPreferences preferences) throws InvalidPreferencesFormatException {
 
-        private Command(byte[] command){
+                if(!preferences.contains("gender") || !preferences.contains("age")
+                        ||!preferences.contains("height") || !preferences.contains("weight")){
+                    throw new InvalidPreferencesFormatException("Missing data");
+                }
+
+                ByteBuffer data = ByteBuffer.allocate(20);
+
+                data.putInt(0xDEADBEEF);
+                data.put(Byte.parseByte(preferences.getString("gender", "0")));
+                data.put(Byte.parseByte(preferences.getString("age", "0")));
+                //FIXME these are ugly because Java is really picky about bytes
+                data.put((byte) (Integer.parseInt(preferences.getString("height", "0")) & 0xFF));
+                data.put((byte) (Integer.parseInt(preferences.getString("weight", "0")) & 0xFF));
+                data.put((byte) 0);
+                data.put((byte) 4);
+                data.put((byte) 0);
+                data.put("cbdevrox".getBytes());
+
+                //calculate the checksum
+                //Log.d("User info", "CRC is " + String.format("%02X", crc(data.array(), 0, 19)));
+                //Log.d("User info", "Original CRC is " + String.format("%02X", Test.getCRC8(data.array(), 0, 19)));
+                data.put((byte) (crc(data.array(), 0, 19) ^ Integer.parseInt(mac.substring(mac.length() - 2), 16)));
+
+                return data.array();
+            }
+
+            private byte crc(byte[] data, int offset, int length) {
+                byte crc = 0x00;
+
+                for (int i = 0; i < length; i++) {
+                    byte temp = data[i + offset];
+
+                    //process byte
+                    for (int j = 0; j < 8; j++) {
+                        int parity = (crc ^ temp) & 0x01;
+                        crc = (byte) ((crc & 0xFF) >>> 1);
+
+                        if (parity != 0) {
+                            crc = (byte) (crc ^ 0x8c);
+                        }
+
+                        temp = (byte) ((temp & 0xFF) >>> 1);
+                    }
+                }
+
+                return crc;
+            }
+        };
+
+        protected byte[] command;
+        private Characteristic endpoint;
+
+        private Command(Characteristic endpoint, byte[] command){
+            this.endpoint = endpoint;
             this.command = command;
         }
 
-        public byte[] getCommand(){
+        public byte[] getCommand(String mac, SharedPreferences preferences) throws InvalidPreferencesFormatException{
             return command;
+        }
+
+        public Characteristic getEndpoint(){
+            return endpoint;
         }
     }
 }

@@ -6,12 +6,27 @@ import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 
 public class PairingCallback extends BLECallback {
+
+    public PairingCallback(BLECallback continuation){
+        super(continuation);
+    }
+
+    public PairingCallback(){
+        super(null);
+    }
+
     private enum PairingState {
         STARTED,
         CHECK;
     }
 
-    PairingState pairState = PairingState.STARTED;
+    private PairingState pairState = PairingState.STARTED;
+
+    @Override
+    public void start(BLEDevice device) {
+        Log.d("PairingCallback", "Pairing callback started");
+        device.requestPriorityRead(Characteristic.PAIR, this);
+    }
 
     @Override
     public void writeCompleted(BLEDevice self, Characteristic characteristic, int status) {
@@ -36,7 +51,7 @@ public class PairingCallback extends BLECallback {
             case STARTED:
                 if(data[0] == (byte)0xFF){
                     Log.d("PairingCallback", "Unpaired device detected, writing pair command");
-                    self.requestPriorityWrite(Characteristic.PAIR, Command.PAIR.getCommand(), this);
+                    self.requestPriorityWrite(Command.PAIR, this, null);
                     return;
                 }
                 Log.d("PairingCallback", "Device seems paired, " + String.format("%02X", data[0]));
@@ -44,6 +59,7 @@ public class PairingCallback extends BLECallback {
             case CHECK:
                 if(data[0] == 0x2){
                     Log.d("PairingCallback", "Successfully paired");
+                    chain(self);
                 }
                 else{
                     Log.d("PairingCallback", "Pairing failed");
