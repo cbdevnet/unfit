@@ -163,6 +163,10 @@ public final class ConstMapper {
                     switch (data[0]) {
                         case 5:
                             return "Authentication OK";
+                        case 8:
+                            return "Latency parameters OK";
+                        case 10:
+                            return "Authentication OK (Reset)";
                     }
                 }
                 else{
@@ -174,7 +178,7 @@ public final class ConstMapper {
         },
         USER_INFO(Service.MILI, "User info", "0000ff04-0000-1000-8000-00805f9b34fb"),
         CONTROL(Service.MILI, "Control", "0000ff05-0000-1000-8000-00805f9b34fb"),
-        REALTIME_STEPS(Service.MILI, "Realtime steps", "0000ff06-0000-1000-8000-00805f9b34fb"){
+        REALTIME_STEPS(Service.MILI, "Steps", "0000ff06-0000-1000-8000-00805f9b34fb"){
             @Override
             public String interpret(byte[] data) {
                 ByteBuffer bb = ByteBuffer.wrap(data);
@@ -187,22 +191,22 @@ public final class ConstMapper {
         TIME(Service.MILI, "Time", "0000ff0a-0000-1000-8000-00805f9b34fb"){
             @Override
             public String interpret(byte[] data) {
-                if(data.length != 12){
+                if((data.length % 6) != 0){
                     return "Invalid time data length";
                 }
 
                 StringBuilder rv = new StringBuilder();
 
-                for(int date = 0; date < 2; date++) {
-                    rv.append(" Date #" + (date + 1) + " ");
+                for(int date = 0; date < data.length / 6; date++) {
+                    rv.append("Date #" + (date + 1) + " ");
 
                     rv.append((data[(date * 6) + 0] + 2000) + "-");
-                    rv.append((data[(date * 6) + 1]) + "-");
+                    rv.append((data[(date * 6) + 1] + 1) + "-");
                     rv.append((data[(date * 6) + 2]) + " ");
 
                     rv.append((data[(date * 6) + 3]) + ":");
                     rv.append((data[(date * 6) + 4]) + ":");
-                    rv.append((data[(date * 6) + 5]));
+                    rv.append((data[(date * 6) + 5]) + " ");
                 }
 
                 return rv.toString();
@@ -312,6 +316,8 @@ public final class ConstMapper {
         VIBRATE2_LED(Characteristic.VIBRATION, new byte[]{1}),
         VIBRATION_STOP(Characteristic.VIBRATION, new byte[]{0}),
 
+        FACTORY_RESET(Characteristic.CONTROL, new byte[]{9}),
+
         SET_GOAL(Characteristic.CONTROL, new byte[]{5, 0}){
             @Override
             public byte[] getCommand(String mac, SharedPreferences preferences) throws InvalidPreferencesFormatException {
@@ -365,7 +371,8 @@ public final class ConstMapper {
 
                 ByteBuffer data = ByteBuffer.allocate(20);
 
-                data.putInt(0xDEADBEEF);
+                data.putInt(0xFEEDFEFE);
+                //data.putInt(0xDEADBEEF);
                 data.put(Byte.parseByte(preferences.getString("gender", "0")));
                 data.put(Byte.parseByte(preferences.getString("age", "0")));
                 //FIXME these are ugly because Java is really picky about bytes
@@ -378,7 +385,6 @@ public final class ConstMapper {
 
                 //calculate the checksum
                 //Log.d("User info", "CRC is " + String.format("%02X", crc(data.array(), 0, 19)));
-                //Log.d("User info", "Original CRC is " + String.format("%02X", Test.getCRC8(data.array(), 0, 19)));
                 data.put((byte) (crc(data.array(), 0, 19) ^ Integer.parseInt(mac.substring(mac.length() - 2), 16)));
 
                 return data.array();

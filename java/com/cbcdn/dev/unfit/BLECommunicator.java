@@ -97,6 +97,22 @@ public class BLECommunicator extends Service {
                 device.requestWrite(Command.REBOOT, null);
             }
         }
+
+        public void resetBand(String mac){
+            BLEDevice device = devices.get(mac);
+            if(device != null){
+                Log.d("BLE service", "Resetting device " + mac);
+                device.requestWrite(Command.FACTORY_RESET, null);
+            }
+        }
+
+        public void runTestCommand(String mac){
+            BLEDevice device = devices.get(mac);
+            if(device != null){
+                Log.d("BLE service", "Testing command on " + mac);
+                device.requestWrite(Command.SET_USER_DATA, PreferenceManager.getDefaultSharedPreferences(self));
+            }
+        }
     }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {

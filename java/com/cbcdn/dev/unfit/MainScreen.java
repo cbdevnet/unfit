@@ -95,15 +95,27 @@ public class MainScreen extends Activity {
         }
     }
 
-    public void writeUserData(View v){
+    public void runSync(View v){
         if(serviceBinder != null){
             serviceBinder.syncBand(currentMAC, PreferenceManager.getDefaultSharedPreferences(this));
         }
     }
 
-    public void doThings(View v){
+    public void rebootBand(View v){
         if(serviceBinder != null){
             serviceBinder.rebootBand(currentMAC);
+        }
+    }
+
+    public void resetBand(View v){
+        if(serviceBinder != null){
+            serviceBinder.resetBand(currentMAC);
+        }
+    }
+
+    public void doThings(View v){
+        if(serviceBinder != null){
+            serviceBinder.runTestCommand(currentMAC);
         }
     }
 

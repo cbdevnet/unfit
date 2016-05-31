@@ -56,18 +56,36 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Write user data"
+        android:text="Run sync CB"
         android:id="@+id/button6"
         android:layout_below="@+id/button"
         android:layout_centerHorizontal="true"
-        android:onClick="writeUserData" />
+        android:onClick="runSync" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Do things"
+        android:text="Reboot"
         android:id="@+id/button7"
         android:layout_below="@+id/button6"
+        android:layout_centerHorizontal="true"
+        android:onClick="rebootBand" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reset"
+        android:id="@+id/button8"
+        android:layout_below="@+id/button7"
+        android:layout_centerHorizontal="true"
+        android:onClick="resetBand" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Write user data"
+        android:id="@+id/button9"
+        android:layout_below="@+id/button8"
         android:layout_centerHorizontal="true"
         android:onClick="doThings" />
 

@@ -25,7 +25,7 @@ public class PairingCallback extends BLECallback {
     @Override
     public void start(BLEDevice device) {
         Log.d("PairingCallback", "Pairing callback started");
-        device.requestPriorityRead(Characteristic.PAIR, this);
+        device.requestRead(Characteristic.PAIR, this);
     }
 
     @Override

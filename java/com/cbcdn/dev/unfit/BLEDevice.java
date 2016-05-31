@@ -110,6 +110,8 @@ public class BLEDevice {
             for(BluetoothGattService service : gatt.getServices()){
                 Log.d("BLE callback", "Service discovered: " + (Service.fromUUID(service.getUuid()) == null ? service.getUuid() : Service.fromUUID(service.getUuid()).toString()));
             }
+
+            gatt.setCharacteristicNotification(gatt.getService(Service.MILI.getUUID()).getCharacteristic(Characteristic.NOTIFICATION.getUUID()), true);
         }
 
         @Override
@@ -291,6 +293,19 @@ public class BLEDevice {
         //TODO check for discovered services
         Log.d("BLE Queue", "Enqueueing read for " + characteristic);
         gattQueue.add(new RWQEntry(characteristic));
+        workQueue();
+        return true;
+    }
+
+    public boolean requestRead(Characteristic characteristic, BLECallback callback){
+        if(state != BTLEState.CONNECTED){
+            Log.d("BLE read", "Device not connected");
+            return false;
+        }
+
+        //TODO check for discovered services
+        Log.d("BLE Queue", "Enqueueing read for " + characteristic);
+        gattQueue.add(new RWQEntry(characteristic, callback));
         workQueue();
         return true;
     }

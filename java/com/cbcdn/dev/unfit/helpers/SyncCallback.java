@@ -24,10 +24,15 @@ public class SyncCallback extends BLECallback {
         this.preferences = preferences;
     }
 
+    public SyncCallback(SharedPreferences preferences, BLECallback continuation){
+        super(continuation);
+        this.preferences = preferences;
+    }
+
     @Override
     public void start(BLEDevice device) {
         Log.d("SyncCallback", "Sync callback started");
-        device.requestPriorityRead(Characteristic.DEVICE_INFO, this);
+        device.requestRead(Characteristic.DEVICE_INFO, this);
     }
 
     @Override
