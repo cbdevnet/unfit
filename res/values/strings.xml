@@ -63,4 +63,5 @@
     <string name="pref_hr_interval_dialog">How often to request a heart rate scan</string>
     <string name="pref_name">Device name</string>
     <string name="pref_name_dialog">Set a device name</string>
+    <string name="debug_screen">Debug screen</string>
 </resources>

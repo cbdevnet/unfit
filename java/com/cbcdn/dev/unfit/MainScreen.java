@@ -15,11 +15,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainScreen extends Activity {
     public final static int REQUEST_MAC = 1;
-    public final static int REQUEST_CONFIG = 2;
     private DatabaseManager db;
     private String currentMAC;
     private BLECommunicator.CommunicatorBinder serviceBinder = null;
@@ -53,11 +53,21 @@ public class MainScreen extends Activity {
         }
     }
 
+    private void updateDisplay(){
+        ((TextView)findViewById(R.id.display_mac)).setText(" " + currentMAC);
+
+        if(serviceBinder != null) {
+            ((TextView) findViewById(R.id.display_connection)).setText(serviceBinder.getStatus(currentMAC).toString());
+        }
+    }
+
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d("MainScreen", "Communicator service bound");
             serviceBinder = (BLECommunicator.CommunicatorBinder) service;
+
+            updateDisplay();
         }
 
         @Override
@@ -66,58 +76,6 @@ public class MainScreen extends Activity {
             serviceBinder = null;
         }
     };
-
-    public void runFirmwareUpdate(View v){
-        if(serviceBinder != null){
-            serviceBinder.updateFirmware();
-        }
-    }
-
-    public void startService(View v){
-        getApplicationContext().startService(new Intent(this.getApplicationContext(), BLECommunicator.class));
-    }
-
-    public void testBand(View v){
-        if(serviceBinder != null){
-            serviceBinder.deviceSelftest();
-        }
-    }
-
-    public void toggleVibration(View v){
-        if(serviceBinder != null){
-            serviceBinder.startVibration(currentMAC);
-        }
-    }
-
-    public void runPairing(View v){
-        if(serviceBinder != null){
-            serviceBinder.pairDevice(currentMAC);
-        }
-    }
-
-    public void runSync(View v){
-        if(serviceBinder != null){
-            serviceBinder.syncBand(currentMAC, PreferenceManager.getDefaultSharedPreferences(this));
-        }
-    }
-
-    public void rebootBand(View v){
-        if(serviceBinder != null){
-            serviceBinder.rebootBand(currentMAC);
-        }
-    }
-
-    public void resetBand(View v){
-        if(serviceBinder != null){
-            serviceBinder.resetBand(currentMAC);
-        }
-    }
-
-    public void doThings(View v){
-        if(serviceBinder != null){
-            serviceBinder.runTestCommand(currentMAC);
-        }
-    }
 
     @Override
     protected void onStart() {
@@ -192,6 +150,9 @@ public class MainScreen extends Activity {
                 return true;
             case R.id.setup_device:
                 startActivity(new Intent(this, SettingsActivity.class).putExtra("MAC", currentMAC));
+                return true;
+            case R.id.debug_screen:
+                startActivity(new Intent(this, DebugScreen.class).putExtra("MAC", currentMAC));
                 return true;
             case R.id.fetch:
                 if(serviceBinder != null){

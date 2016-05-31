@@ -9,84 +9,38 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.cbcdn.dev.unfit.MainScreen">
 
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Run firmware update"
-        android:id="@+id/button2"
-        android:layout_centerHorizontal="true"
-        android:onClick="runFirmwareUpdate" />
+        android:text="Name"
+        android:id="@+id/display_name"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start service"
-        android:id="@+id/button3"
-        android:layout_below="@+id/button2"
-        android:layout_centerHorizontal="true"
-        android:onClick="startService" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="FF:FF:FF:FF:FF:FF"
+        android:id="@+id/display_mac"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/display_name" />
 
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Run test"
-        android:id="@+id/button4"
-        android:layout_below="@+id/button3"
-        android:layout_centerHorizontal="true"
-        android:onClick="testBand" />
+        android:text="Disconnected"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/display_connection"
+        android:layout_alignBottom="@+id/display_name"
+        android:layout_alignParentEnd="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Vibrate 2"
-        android:id="@+id/button5"
-        android:layout_below="@+id/button4"
-        android:layout_centerHorizontal="true"
-        android:onClick="toggleVibration" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Run Pairing CB"
-        android:id="@+id/button"
-        android:layout_below="@+id/button5"
-        android:layout_centerHorizontal="true"
-        android:onClick="runPairing" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Run sync CB"
-        android:id="@+id/button6"
-        android:layout_below="@+id/button"
-        android:layout_centerHorizontal="true"
-        android:onClick="runSync" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Reboot"
-        android:id="@+id/button7"
-        android:layout_below="@+id/button6"
-        android:layout_centerHorizontal="true"
-        android:onClick="rebootBand" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Reset"
-        android:id="@+id/button8"
-        android:layout_below="@+id/button7"
-        android:layout_centerHorizontal="true"
-        android:onClick="resetBand" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Write user data"
-        android:id="@+id/button9"
-        android:layout_below="@+id/button8"
-        android:layout_centerHorizontal="true"
-        android:onClick="doThings" />
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/display_scroller"
+        android:layout_below="@+id/display_name"
+        android:layout_alignParentStart="true"/>
 
 </RelativeLayout>

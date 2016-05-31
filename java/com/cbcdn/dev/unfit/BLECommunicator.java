@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
+import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
 import com.cbcdn.dev.unfit.helpers.PairingCallback;
 import com.cbcdn.dev.unfit.helpers.SyncCallback;
 
@@ -112,6 +113,14 @@ public class BLECommunicator extends Service {
                 Log.d("BLE service", "Testing command on " + mac);
                 device.requestWrite(Command.SET_USER_DATA, PreferenceManager.getDefaultSharedPreferences(self));
             }
+        }
+
+        public BTLEState getStatus(String mac) {
+            BLEDevice device = devices.get(mac);
+            if(device != null){
+                return device.getConnectionStatus();
+            }
+            return BTLEState.DISCONNECTED;
         }
     }
 

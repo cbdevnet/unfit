@@ -34,4 +34,8 @@
     <item android:id="@+id/manual_sync"
         android:title="@string/manual_sync"
         />
+
+    <item android:id="@+id/debug_screen"
+        android:title="@string/debug_screen"
+        />
 </menu>

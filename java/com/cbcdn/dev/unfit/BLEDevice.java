@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 import com.cbcdn.dev.unfit.helpers.BLECallback;
+import com.cbcdn.dev.unfit.helpers.ConstMapper;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Service;
@@ -34,6 +35,10 @@ public class BLEDevice {
     private BluetoothGatt gatt;
     private BTLEState state = BTLEState.DISCONNECTED;
     private BLEDevice self = this;
+
+    public BTLEState getConnectionStatus() {
+        return state;
+    }
 
     private class RWQEntry {
         private Characteristic characteristic;
