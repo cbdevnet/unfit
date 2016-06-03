@@ -124,7 +124,7 @@ public final class ConstMapper {
     }
 
     public enum Characteristic {
-        DEVICE_INFO(Service.MILI, "Device info", "0000ff01-0000-1000-8000-00805f9b34fb"){
+        DEVICE_INFO(Service.MILI, "Device info", "0000ff01-0000-1000-8000-00805f9b34fb", false, false){
             @Override
             public String interpret(byte[] data) {
                 if(data.length ==16 || data.length == 20){
@@ -150,13 +150,13 @@ public final class ConstMapper {
                 }
             }
         },
-        DEVICE_NAME(Service.MILI, "Device name", "0000ff02-0000-1000-8000-00805f9b34fb"){
+        DEVICE_NAME(Service.MILI, "Device name", "0000ff02-0000-1000-8000-00805f9b34fb", false, false){
             @Override
             public String interpret(byte[] data) {
                 return new String(data);
             }
         },
-        NOTIFICATION(Service.MILI, "Notification", "0000ff03-0000-1000-8000-00805f9b34fb"){
+        NOTIFICATION(Service.MILI, "Notification", "0000ff03-0000-1000-8000-00805f9b34fb", true, false){
             @Override
             public String interpret(byte[] data) {
                 if(data.length > 0) {
@@ -176,19 +176,19 @@ public final class ConstMapper {
                 return "Unknown notification byte";
             }
         },
-        USER_INFO(Service.MILI, "User info", "0000ff04-0000-1000-8000-00805f9b34fb"),
-        CONTROL(Service.MILI, "Control", "0000ff05-0000-1000-8000-00805f9b34fb"),
-        REALTIME_STEPS(Service.MILI, "Steps", "0000ff06-0000-1000-8000-00805f9b34fb"){
+        USER_INFO(Service.MILI, "User info", "0000ff04-0000-1000-8000-00805f9b34fb", true, false),
+        CONTROL(Service.MILI, "Control", "0000ff05-0000-1000-8000-00805f9b34fb", false, false),
+        REALTIME_STEPS(Service.MILI, "Steps", "0000ff06-0000-1000-8000-00805f9b34fb", true, true){
             @Override
             public String interpret(byte[] data) {
                 ByteBuffer bb = ByteBuffer.wrap(data);
                 return Integer.reverseBytes(bb.getInt()) + " steps";
             }
         },
-        ACTIVITY(Service.MILI, "Activity?", "0000ff07-0000-1000-8000-00805f9b34fb"),
-        FIRMWARE(Service.MILI, "Firmware data", "0000ff08-0000-1000-8000-00805f9b34fb"),
-        BLE_PARAMS(Service.MILI, "BLE parameters", "0000ff09-0000-1000-8000-00805f9b34fb"),
-        TIME(Service.MILI, "Time", "0000ff0a-0000-1000-8000-00805f9b34fb"){
+        ACTIVITY(Service.MILI, "Activity?", "0000ff07-0000-1000-8000-00805f9b34fb", true, false),
+        FIRMWARE(Service.MILI, "Firmware data", "0000ff08-0000-1000-8000-00805f9b34fb", false, false),
+        BLE_PARAMS(Service.MILI, "BLE parameters", "0000ff09-0000-1000-8000-00805f9b34fb", true, false),
+        TIME(Service.MILI, "Time", "0000ff0a-0000-1000-8000-00805f9b34fb", true, true){
             @Override
             public String interpret(byte[] data) {
                 if((data.length % 6) != 0){
@@ -212,8 +212,8 @@ public final class ConstMapper {
                 return rv.toString();
             }
         },
-        STATISTICS(Service.MILI, "Statistics", "0000ff0b-0000-1000-8000-00805f9b34fb"),
-        BATTERY(Service.MILI, "Battery", "0000ff0c-0000-1000-8000-00805f9b34fb"){
+        STATISTICS(Service.MILI, "Statistics", "0000ff0b-0000-1000-8000-00805f9b34fb", true, true),
+        BATTERY(Service.MILI, "Battery", "0000ff0c-0000-1000-8000-00805f9b34fb", true, true){
             @Override
             public String interpret(byte[] data) {
                 if(data.length != 10){
@@ -231,9 +231,9 @@ public final class ConstMapper {
                 return rv.toString();
             }
         },
-        TEST(Service.MILI, "Device test", "0000ff0d-0000-1000-8000-00805f9b34fb"),
-        SENSOR(Service.MILI, "Sensor data?", "0000ff0e-0000-1000-8000-00805f9b34fb"),
-        PAIR(Service.MILI, "Pairing", "0000ff0f-0000-1000-8000-00805f9b34fb"){
+        TEST(Service.MILI, "Device test", "0000ff0d-0000-1000-8000-00805f9b34fb", false, false),
+        SENSOR(Service.MILI, "Sensor data?", "0000ff0e-0000-1000-8000-00805f9b34fb", true, true),
+        PAIR(Service.MILI, "Pairing", "0000ff0f-0000-1000-8000-00805f9b34fb", false, false){
             @Override
             public String interpret(byte[] data) {
                 if(data.length < 1) {
@@ -251,32 +251,44 @@ public final class ConstMapper {
             }
         },
 
-        HEARTRATE_NOTIFICATION(Service.HEARTRATE, "Heart rate notification", "00002a37-0000-1000-8000-00805f9b34fb"),
-        HEARTRATE(Service.HEARTRATE, "Heart rate", "00002a39-0000-1000-8000-00805f9b34fb"),
+        HEARTRATE_NOTIFICATION(Service.HEARTRATE, "Heart rate notification", "00002a37-0000-1000-8000-00805f9b34fb", false, false),
+        HEARTRATE(Service.HEARTRATE, "Heart rate", "00002a39-0000-1000-8000-00805f9b34fb", false, true),
 
-        GENERIC_DEVICE_NAME(Service.ACCESS, "Device name", "00002a00-0000-1000-8000-00805f9b34fb"){
+        GENERIC_DEVICE_NAME(Service.ACCESS, "Device name", "00002a00-0000-1000-8000-00805f9b34fb", true, true){
             @Override
             public String interpret(byte[] data) {
                 return new String(data);
             }
         },
-        GENERIC_DEVICE_APPEARANCE(Service.ACCESS, "Device appearance", "00002a01-0000-1000-8000-00805f9b34fb"),
-        PERIPHERAL_PRIVACY(Service.ACCESS, "Peripheral privacy", "00002a02-0000-1000-8000-00805f9b34fb"),
-        CONNECTION_PARAMS(Service.ACCESS, "Preferred connection parameters", "00002a04-0000-1000-8000-00805f9b34fb"),
+        GENERIC_DEVICE_APPEARANCE(Service.ACCESS, "Device appearance", "00002a01-0000-1000-8000-00805f9b34fb", false, false),
+        PERIPHERAL_PRIVACY(Service.ACCESS, "Peripheral privacy", "00002a02-0000-1000-8000-00805f9b34fb", true, false),
+        CONNECTION_PARAMS(Service.ACCESS, "Preferred connection parameters", "00002a04-0000-1000-8000-00805f9b34fb", true, false),
 
-        SERVICE_CHANGED(Service.ATTRIBUTES, "GAP Service changed", "00002a05-0000-1000-8000-00805f9b34fb"),
+        SERVICE_CHANGED(Service.ATTRIBUTES, "GAP Service changed", "00002a05-0000-1000-8000-00805f9b34fb", false, false),
 
-        VIBRATION(Service.VIBRATE, "Vibration", "00002a06-0000-1000-8000-00805f9b34fb");
+        VIBRATION(Service.VIBRATE, "Vibration", "00002a06-0000-1000-8000-00805f9b34fb", false, false);
 
         private Service parent;
         private String ident;
         private UUID uuid;
         private static Map<UUID, Characteristic> uuidMap = new HashMap<>();
+        private boolean passive;
+        private boolean displayed;
 
-        private Characteristic(Service parent, String name, String uuid){
+        private Characteristic(Service parent, String name, String uuid, boolean passive, boolean displayed){
             this.parent = parent;
             this.ident = name;
             this.uuid = UUID.fromString(uuid);
+            this.passive = passive;
+            this.displayed = displayed;
+        }
+
+        public boolean isPassive() {
+            return passive;
+        }
+
+        public boolean isDisplayed(){
+            return displayed;
         }
 
         public String interpret(byte[] data){

@@ -1,6 +1,8 @@
 package com.cbcdn.dev.unfit;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.ScanRecord;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,14 +17,51 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.cbcdn.dev.unfit.helpers.BLECallback;
+import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
+import com.cbcdn.dev.unfit.helpers.ValueListAdapter;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class MainScreen extends Activity {
     public final static int REQUEST_MAC = 1;
     private DatabaseManager db;
     private String currentMAC;
     private BLECommunicator.CommunicatorBinder serviceBinder = null;
+    private ValueListAdapter listAdapter;
+
+    private BLECallback updaterCallback = new BLECallback() {
+        @Override
+        public void start(BLEDevice device) {
+        }
+
+        @Override
+        public void readCompleted(BLEDevice self, final Characteristic characteristic, int status, final byte[] data) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    listAdapter.update(characteristic, data);
+                    updateDisplay();
+                }
+            });
+        }
+
+        @Override
+        public void connectionChanged(BLEDevice self) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateDisplay();
+                }
+            });
+        }
+    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -66,13 +105,14 @@ public class MainScreen extends Activity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d("MainScreen", "Communicator service bound");
             serviceBinder = (BLECommunicator.CommunicatorBinder) service;
-
+            serviceBinder.registerCallback(currentMAC, updaterCallback);
             updateDisplay();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName className) {
             Log.d("MainScreen", "Communicator service detached");
+            serviceBinder.unregisterCallback(currentMAC, updaterCallback);
             serviceBinder = null;
         }
     };
@@ -134,6 +174,22 @@ public class MainScreen extends Activity {
         Log.d("MainScreen", "Active device MAC " + currentMAC);
 
         devices.close();
+
+        List<Characteristic> listedCharacteristics = new LinkedList<>();
+        for(Characteristic c : Characteristic.values()){
+            if(c.isDisplayed()){
+                listedCharacteristics.add(c);
+            }
+        }
+
+        listAdapter = new ValueListAdapter(listedCharacteristics);
+        ((ListView)this.findViewById(R.id.display_scroller)).setAdapter(listAdapter);
+        ((ListView)this.findViewById(R.id.display_scroller)).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //TODO onclick handler
+            }
+        });
     }
 
     @Override
@@ -144,6 +200,7 @@ public class MainScreen extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //TODO when changing active device, reset the callback
         switch (item.getItemId()) {
             case R.id.pair_device:
                 startActivityForResult(new Intent(this, PairActivity.class), REQUEST_MAC);

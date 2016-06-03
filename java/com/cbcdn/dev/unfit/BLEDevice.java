@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 import com.cbcdn.dev.unfit.helpers.BLECallback;
-import com.cbcdn.dev.unfit.helpers.ConstMapper;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Service;
@@ -18,8 +17,12 @@ import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.prefs.InvalidPreferencesFormatException;
 
 public class BLEDevice {
@@ -35,9 +38,18 @@ public class BLEDevice {
     private BluetoothGatt gatt;
     private BTLEState state = BTLEState.DISCONNECTED;
     private BLEDevice self = this;
+    private Map<Characteristic, byte[]> recentData = new HashMap<>();
 
     public BTLEState getConnectionStatus() {
         return state;
+    }
+
+    public void registerGenericCallback(BLECallback callback){
+        notificationListeners.add(callback);
+    }
+
+    public void unregisterGenericCallback(BLECallback callback){
+        notificationListeners.remove(callback);
     }
 
     private class RWQEntry {
@@ -94,7 +106,7 @@ public class BLEDevice {
     }
 
     private List<RWQEntry> gattQueue = new LinkedList<>();
-    private List<BLECallback> notificationListeners = new LinkedList<>();
+    private Set<BLECallback> notificationListeners = new HashSet<>();
     private BluetoothGattCallback callback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -105,6 +117,12 @@ public class BLEDevice {
             if(newState == BTLEState.CONNECTED.getValue()){
                 Log.d("BLE callback", "Connection established, starting service discovery");
                 gatt.discoverServices();
+                //upon first connection, run callback only when services discovered
+                return;
+            }
+
+            for(BLECallback callback : notificationListeners){
+                callback.connectionChanged(self);
             }
         }
 
@@ -117,6 +135,10 @@ public class BLEDevice {
             }
 
             gatt.setCharacteristicNotification(gatt.getService(Service.MILI.getUUID()).getCharacteristic(Characteristic.NOTIFICATION.getUUID()), true);
+
+            for(BLECallback callback : notificationListeners){
+                callback.connectionChanged(self);
+            }
         }
 
         @Override
@@ -139,6 +161,10 @@ public class BLEDevice {
             else{
                 Log.e("BLE queue", "Invalid state: head not workable");
             }
+
+            for(BLECallback callback : notificationListeners){
+                callback.writeCompleted(self, Characteristic.fromUUID(characteristic.getUuid()), status);
+            }
         }
 
         @Override
@@ -155,6 +181,9 @@ public class BLEDevice {
             else {
                 Log.d("BLE callback", "Characteristic " + c + " read: "
                         + status + " " + dumpBytes(characteristic.getValue()) + ": " + c.interpret(characteristic.getValue()));
+
+                recentData.put(c, characteristic.getValue());
+
                 RWQEntry head = gattQueue.size() > 0 ? gattQueue.get(0) : null;
                 if (head != null && head.inProgress && head.matches(Characteristic.fromUUID(characteristic.getUuid()), false)) {
                     gattQueue.remove(0);
@@ -164,6 +193,9 @@ public class BLEDevice {
                 else{
                     Log.e("BLE queue", "Invalid state: head not workable");
                 }
+            }
+            for(BLECallback callback : notificationListeners){
+                callback.readCompleted(self, Characteristic.fromUUID(characteristic.getUuid()), status, characteristic.getValue());
             }
         }
 
@@ -259,7 +291,7 @@ public class BLEDevice {
     }
 
     public boolean requestPassiveDataRead(){
-        return this.requestRead(Characteristic.ACTIVITY)
+        /*return this.requestRead(Characteristic.ACTIVITY)
                 && this.requestRead(Characteristic.BATTERY)
                 && this.requestRead(Characteristic.USER_INFO)
                 && this.requestRead(Characteristic.BLE_PARAMS)
@@ -273,7 +305,15 @@ public class BLEDevice {
                 && this.requestRead(Characteristic.PERIPHERAL_PRIVACY)
                 && this.requestRead(Characteristic.REALTIME_STEPS)
                 && this.requestRead(Characteristic.SENSOR)
-                && this.requestRead(Characteristic.STATISTICS);
+                && this.requestRead(Characteristic.STATISTICS);*/
+        for(Characteristic characteristic : Characteristic.values()){
+            if(characteristic.isPassive()){
+                if(!this.requestRead(characteristic)){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public boolean requestPriorityRead(Characteristic characteristic, BLECallback callback){

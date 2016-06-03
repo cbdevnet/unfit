@@ -12,11 +12,11 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import com.cbcdn.dev.unfit.helpers.BLECallback;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
 import com.cbcdn.dev.unfit.helpers.PairingCallback;
 import com.cbcdn.dev.unfit.helpers.SyncCallback;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -121,6 +121,22 @@ public class BLECommunicator extends Service {
                 return device.getConnectionStatus();
             }
             return BTLEState.DISCONNECTED;
+        }
+
+        public void registerCallback(String mac, BLECallback callback){
+            BLEDevice device = devices.get(mac);
+            if(device != null){
+                Log.d("BLE service", "Registering callback on " + mac);
+                device.registerGenericCallback(callback);
+            }
+        }
+
+        public void unregisterCallback(String mac, BLECallback callback){
+            BLEDevice device = devices.get(mac);
+            if(device != null) {
+                Log.d("BLE service", "Unregistering callback on " + mac);
+                device.unregisterGenericCallback(callback);
+            }
         }
     }
 

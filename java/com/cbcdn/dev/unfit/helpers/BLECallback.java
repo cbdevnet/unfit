@@ -22,6 +22,9 @@ public abstract class BLECallback {
     public void readCompleted(BLEDevice self, Characteristic characteristic, int status, byte[] data) {
     }
 
+    public void connectionChanged(BLEDevice self){
+    }
+
     protected final void chain(BLEDevice self){
         if(continuation != null){
             continuation.start(self);
