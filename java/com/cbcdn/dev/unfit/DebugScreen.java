@@ -102,11 +102,6 @@ public class DebugScreen extends Activity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         currentMAC = getIntent().getStringExtra("MAC");
         super.onCreate(savedInstanceState);

@@ -46,10 +46,12 @@ public class BLEDevice {
 
     public void registerGenericCallback(BLECallback callback){
         notificationListeners.add(callback);
+        Log.d("BLEDevice", "Currently at " + notificationListeners.size() + " callbacks");
     }
 
     public void unregisterGenericCallback(BLECallback callback){
         notificationListeners.remove(callback);
+        Log.d("BLEDevice", "Currently at " + notificationListeners.size() + " callbacks");
     }
 
     private class RWQEntry {
@@ -253,7 +255,7 @@ public class BLEDevice {
             InputStream fwStream = context.getAssets().open("mi1s.fw");
 
             for(int data = fwStream.read(); data >= 0; data = fwStream.read()){
-                fwData.add(new Byte((byte)data));
+                fwData.add(Byte.valueOf((byte)data));
             }
 
             fwStream.close();

@@ -64,12 +64,11 @@ public class ValueListAdapter extends BaseAdapter implements ListAdapter {
     public void update(Characteristic characteristic, byte[] data){
         int location = characteristics.indexOf(characteristic);
         if(location < 0){
-            Log.e("ValueListAdapter", "Update on unlisted characteristic requested");
+            Log.e("ValueListAdapter", "Update on unlisted characteristic " + characteristic + " requested");
             return;
         }
         Log.d("ValueListAdapter", "Characteristic data for " + characteristic + " updated");
         notifyDataSetChanged();
         characteristicData.put(characteristic, data);
-        return;
     }
 }

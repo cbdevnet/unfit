@@ -1,6 +1,5 @@
 package com.cbcdn.dev.unfit.helpers;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanRecord;
 import android.util.Log;
@@ -17,7 +16,7 @@ import java.util.List;
 
 public class DeviceListAdapter extends BaseAdapter implements ListAdapter {
 
-    private List<Pair<ScanRecord, BluetoothDevice>> members = new LinkedList<Pair<ScanRecord, BluetoothDevice>>();
+    private List<Pair<ScanRecord, BluetoothDevice>> members = new LinkedList<>();
 
     @Override
     public int getCount() {
@@ -59,7 +58,7 @@ public class DeviceListAdapter extends BaseAdapter implements ListAdapter {
     }
 
     public void add(ScanRecord scanRecord, BluetoothDevice device) {
-        members.add(new Pair<ScanRecord, BluetoothDevice>(scanRecord, device));
+        members.add(new Pair<>(scanRecord, device));
         notifyDataSetChanged();
     }
 

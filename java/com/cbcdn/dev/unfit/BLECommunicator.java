@@ -173,6 +173,7 @@ public class BLECommunicator extends Service {
                 devices.get(deviceCursor.getString(0)).connect(this);
             }
         }
+        deviceCursor.close();
         return super.onStartCommand(intent, flags, startId);
     }
 

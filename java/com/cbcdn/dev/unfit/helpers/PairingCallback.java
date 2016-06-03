@@ -17,7 +17,7 @@ public class PairingCallback extends BLECallback {
 
     private enum PairingState {
         STARTED,
-        CHECK;
+        CHECK
     }
 
     private PairingState pairState = PairingState.STARTED;

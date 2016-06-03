@@ -24,13 +24,13 @@ public final class ConstMapper {
         private String desc;
         private static Map<Integer, ChargeState> valueMap = new HashMap<>();
 
-        private ChargeState(int value, String desc){
+        ChargeState(int value, String desc){
             this.value = value;
             this.desc = desc;
         }
 
         public static ChargeState getByValue(int value){
-            return valueMap.get(new Integer(value));
+            return valueMap.get(Integer.valueOf(value));
         }
 
         @Override
@@ -60,13 +60,13 @@ public final class ConstMapper {
         private int value;
         private static Map<Integer, BTLEState> valueMap = new HashMap<>();
 
-        private BTLEState(String name, int value){
+        BTLEState(String name, int value){
             this.name = name;
             this.value = value;
         }
 
         public static BTLEState getByValue(int value){
-            return valueMap.get(new Integer(value));
+            return valueMap.get(Integer.valueOf(value));
         }
 
         @Override
@@ -98,7 +98,7 @@ public final class ConstMapper {
         private UUID uuid;
         private static Map<UUID, Service> uuidMap = new HashMap<>();
 
-        private Service(String name, String uuid){
+        Service(String name, String uuid){
             this.ident = name;
             this.uuid = UUID.fromString(uuid);
         }
@@ -124,7 +124,7 @@ public final class ConstMapper {
     }
 
     public enum Characteristic {
-        DEVICE_INFO(Service.MILI, "Device info", "0000ff01-0000-1000-8000-00805f9b34fb", false, false){
+        DEVICE_INFO(Service.MILI, "Device info", "0000ff01-0000-1000-8000-00805f9b34fb", true, true){
             @Override
             public String interpret(byte[] data) {
                 if(data.length ==16 || data.length == 20){
@@ -193,6 +193,10 @@ public final class ConstMapper {
             public String interpret(byte[] data) {
                 if((data.length % 6) != 0){
                     return "Invalid time data length";
+                }
+
+                if(data.length == 0){
+                    return "No data";
                 }
 
                 StringBuilder rv = new StringBuilder();
@@ -275,7 +279,7 @@ public final class ConstMapper {
         private boolean passive;
         private boolean displayed;
 
-        private Characteristic(Service parent, String name, String uuid, boolean passive, boolean displayed){
+        Characteristic(Service parent, String name, String uuid, boolean passive, boolean displayed){
             this.parent = parent;
             this.ident = name;
             this.uuid = UUID.fromString(uuid);
@@ -429,7 +433,7 @@ public final class ConstMapper {
         protected byte[] command;
         private Characteristic endpoint;
 
-        private Command(Characteristic endpoint, byte[] command){
+        Command(Characteristic endpoint, byte[] command){
             this.endpoint = endpoint;
             this.command = command;
         }

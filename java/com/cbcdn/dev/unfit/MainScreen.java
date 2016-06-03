@@ -1,8 +1,6 @@
 package com.cbcdn.dev.unfit;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.le.ScanRecord;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
@@ -30,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MainScreen extends Activity {
-    public final static int REQUEST_MAC = 1;
+    private final static int REQUEST_MAC = 1;
     private DatabaseManager db;
     private String currentMAC;
     private BLECommunicator.CommunicatorBinder serviceBinder = null;

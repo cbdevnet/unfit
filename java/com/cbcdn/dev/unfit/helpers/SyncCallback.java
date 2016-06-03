@@ -13,7 +13,7 @@ public class SyncCallback extends BLECallback {
         USER_DATA,
         WEAR_LOCATION,
         GOAL,
-        TIME;
+        TIME
     }
 
     private SyncState syncState = SyncState.STARTED;
