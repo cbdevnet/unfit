@@ -34,7 +34,8 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:id="@+id/display_connection"
         android:layout_alignBottom="@+id/display_name"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:onClick="reconnectDevice" />
 
     <ListView
         android:layout_width="match_parent"

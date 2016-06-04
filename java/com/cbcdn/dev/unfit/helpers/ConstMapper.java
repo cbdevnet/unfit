@@ -30,7 +30,7 @@ public final class ConstMapper {
         }
 
         public static ChargeState getByValue(int value){
-            return valueMap.get(Integer.valueOf(value));
+            return valueMap.get(value);
         }
 
         @Override
@@ -66,7 +66,7 @@ public final class ConstMapper {
         }
 
         public static BTLEState getByValue(int value){
-            return valueMap.get(Integer.valueOf(value));
+            return valueMap.get(value);
         }
 
         @Override

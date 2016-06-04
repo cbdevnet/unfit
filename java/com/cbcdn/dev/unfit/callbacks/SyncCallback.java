@@ -1,8 +1,9 @@
-package com.cbcdn.dev.unfit.helpers;
+package com.cbcdn.dev.unfit.callbacks;
 
 import android.bluetooth.BluetoothGatt;
 import android.content.SharedPreferences;
 import android.util.Log;
+
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 import com.cbcdn.dev.unfit.BLEDevice;

@@ -9,7 +9,7 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-import com.cbcdn.dev.unfit.helpers.BLECallback;
+import com.cbcdn.dev.unfit.callbacks.BLECallback;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Service;
@@ -255,7 +255,7 @@ public class BLEDevice {
             InputStream fwStream = context.getAssets().open("mi1s.fw");
 
             for(int data = fwStream.read(); data >= 0; data = fwStream.read()){
-                fwData.add(Byte.valueOf((byte)data));
+                fwData.add((byte)data);
             }
 
             fwStream.close();

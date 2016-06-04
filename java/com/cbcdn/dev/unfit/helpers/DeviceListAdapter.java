@@ -37,7 +37,7 @@ public class DeviceListAdapter extends BaseAdapter implements ListAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if(convertView == null) {
             Log.d("Adapter", "Inflating new Layout");
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.device_entry, null);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.device_entry, parent, false);
         }
         else{
             Log.d("Adapter", "Reusing old Layout");
@@ -50,8 +50,8 @@ public class DeviceListAdapter extends BaseAdapter implements ListAdapter {
             mac.setText(members.get(position).second.getAddress());
         }
 
-        if(name != null){
-            name.setText((members.get(position).first.getDeviceName() == null)? "<unnamed>":members.get(position).first.getDeviceName());
+        if(name != null && members.get(position).first.getDeviceName() != null){
+            name.setText(members.get(position).first.getDeviceName());
         }
 
         return convertView;

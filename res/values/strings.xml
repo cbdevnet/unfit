@@ -65,4 +65,6 @@
     <string name="pref_name_dialog">Set a device name</string>
     <string name="debug_screen">Debug screen</string>
     <string name="no_data">No data yet</string>
+    <string name="unnamed_device"><![CDATA[<unnamed>]]></string>
+    <string name="device_found">Device found</string>
 </resources>

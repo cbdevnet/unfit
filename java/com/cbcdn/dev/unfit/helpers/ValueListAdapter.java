@@ -41,7 +41,7 @@ public class ValueListAdapter extends BaseAdapter implements ListAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if(convertView == null) {
             Log.d("Adapter", "Inflating new Layout");
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.characteristic_display, null);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.characteristic_display, parent, false);
         }
         else{
             Log.d("Adapter", "Reusing old Layout");

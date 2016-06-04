@@ -1,10 +1,10 @@
-package com.cbcdn.dev.unfit.helpers;
+package com.cbcdn.dev.unfit.callbacks;
 
 import com.cbcdn.dev.unfit.BLEDevice;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 
 public abstract class BLECallback {
-    protected BLECallback continuation = null;
+    private BLECallback continuation = null;
 
     public BLECallback(BLECallback continuation){
         this.continuation = continuation;

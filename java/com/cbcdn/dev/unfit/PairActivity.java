@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.cbcdn.dev.unfit.helpers.ContextRunnable;
 import com.cbcdn.dev.unfit.helpers.DeviceListAdapter;
 
 import java.util.List;
@@ -72,15 +71,15 @@ public class PairActivity extends Activity {
         }
 
         new Handler().postDelayed(
-                new ContextRunnable(this) {
+                new Runnable() {
                     @Override
                     public void run() {
                         if(currentlyScanning) {
                             BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner().stopScan(deviceDetected);
                             currentlyScanning = false;
                             BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner().flushPendingScanResults(deviceDetected);
-                            ((Activity) passedContext).findViewById(R.id.scanningSpinner).setVisibility(View.INVISIBLE);
-                            ((Activity) passedContext).findViewById(R.id.scanDevices).setVisibility(View.VISIBLE);
+                            self.findViewById(R.id.scanningSpinner).setVisibility(View.INVISIBLE);
+                            self.findViewById(R.id.scanDevices).setVisibility(View.VISIBLE);
                             Log.d("Scanner", "Scan stopped with timeout");
                         }
                     }

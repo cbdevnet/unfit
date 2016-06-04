@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="fill_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:padding="20dp"
-    android:layout_marginBottom="20dp"
-    android:background="@color/colorBGAccent">
+    android:layout_marginBottom="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/device_found"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/deviceFound" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/deviceMac"
-        android:layout_gravity="left|center_horizontal" />
+        android:text="FF:FF:FF:FF:FF:FF"
+        android:layout_alignParentRight="true"
+        />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/deviceName"
-        android:layout_gravity="left|center_horizontal" />
-</LinearLayout>
+        android:text="@string/unnamed_device"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/deviceFound"
+        android:layout_gravity="center_horizontal" />
+</RelativeLayout>

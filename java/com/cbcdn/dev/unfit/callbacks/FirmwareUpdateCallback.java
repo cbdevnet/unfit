@@ -1,6 +1,7 @@
-package com.cbcdn.dev.unfit.helpers;
+package com.cbcdn.dev.unfit.callbacks;
 
 import com.cbcdn.dev.unfit.BLEDevice;
+import com.cbcdn.dev.unfit.helpers.ConstMapper;
 
 public class FirmwareUpdateCallback extends BLECallback {
     public FirmwareUpdateCallback(BLECallback continuation) {

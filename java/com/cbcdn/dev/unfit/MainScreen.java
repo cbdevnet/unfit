@@ -20,7 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cbcdn.dev.unfit.helpers.BLECallback;
+import com.cbcdn.dev.unfit.callbacks.BLECallback;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 import com.cbcdn.dev.unfit.helpers.ValueListAdapter;
 
@@ -114,6 +114,12 @@ public class MainScreen extends Activity {
             serviceBinder = null;
         }
     };
+
+    public void reconnectDevice(View v){
+        if(serviceBinder != null){
+            serviceBinder.reconnectDevice(currentMAC);
+        }
+    }
 
     @Override
     protected void onStart() {
@@ -216,11 +222,8 @@ public class MainScreen extends Activity {
                 }
                 return false;
             case R.id.reconnect:
-                if(serviceBinder != null){
-                    serviceBinder.reconnectDevice(currentMAC);
-                    return true;
-                }
-                return false;
+                reconnectDevice(null);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

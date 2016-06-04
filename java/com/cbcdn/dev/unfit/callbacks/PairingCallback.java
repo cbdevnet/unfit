@@ -1,4 +1,4 @@
-package com.cbcdn.dev.unfit.helpers;
+package com.cbcdn.dev.unfit.callbacks;
 
 import android.util.Log;
 import com.cbcdn.dev.unfit.BLEDevice;
