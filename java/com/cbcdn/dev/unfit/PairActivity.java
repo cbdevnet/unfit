@@ -14,6 +14,7 @@ import android.util.Pair;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.cbcdn.dev.unfit.helpers.DeviceListAdapter;
 
@@ -49,7 +50,7 @@ public class PairActivity extends Activity {
             super.onScanFailed(errorCode);
             self.findViewById(R.id.scanDevices).setVisibility(View.VISIBLE);
             self.findViewById(R.id.scanningSpinner).setVisibility(View.INVISIBLE);
-            //TODO print message
+            Toast.makeText(self, "BLE Scan failed, error code " + errorCode, Toast.LENGTH_SHORT).show();
         }
     };
 

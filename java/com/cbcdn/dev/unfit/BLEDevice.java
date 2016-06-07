@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 import com.cbcdn.dev.unfit.callbacks.BLECallback;
+import com.cbcdn.dev.unfit.helpers.ConstMapper;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Service;
@@ -52,6 +53,10 @@ public class BLEDevice {
     public void unregisterGenericCallback(BLECallback callback){
         notificationListeners.remove(callback);
         Log.d("BLEDevice", "Currently at " + notificationListeners.size() + " callbacks");
+    }
+
+    public byte[] queryCachedData(Characteristic characteristic) {
+        return recentData.get(characteristic);
     }
 
     private class RWQEntry {
@@ -124,6 +129,7 @@ public class BLEDevice {
             }
 
             for(BLECallback callback : notificationListeners){
+                Log.d("BLE Device", "Running callback");
                 callback.connectionChanged(self);
             }
         }
@@ -139,6 +145,7 @@ public class BLEDevice {
             gatt.setCharacteristicNotification(gatt.getService(Service.MILI.getUUID()).getCharacteristic(Characteristic.NOTIFICATION.getUUID()), true);
 
             for(BLECallback callback : notificationListeners){
+                Log.d("BLE Device", "Running callback");
                 callback.connectionChanged(self);
             }
         }
@@ -165,6 +172,7 @@ public class BLEDevice {
             }
 
             for(BLECallback callback : notificationListeners){
+                Log.d("BLE Device", "Running callback");
                 callback.writeCompleted(self, Characteristic.fromUUID(characteristic.getUuid()), status);
             }
         }
@@ -293,6 +301,7 @@ public class BLEDevice {
     }
 
     public boolean requestPassiveDataRead(){
+        //TODO move this to a chainable callback
         /*return this.requestRead(Characteristic.ACTIVITY)
                 && this.requestRead(Characteristic.BATTERY)
                 && this.requestRead(Characteristic.USER_INFO)

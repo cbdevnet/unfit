@@ -1,4 +1,5 @@
 package com.cbcdn.dev.unfit.helpers;
+import com.cbcdn.dev.unfit.BLECommunicator;
 import com.cbcdn.dev.unfit.R;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 
@@ -68,7 +69,16 @@ public class ValueListAdapter extends BaseAdapter implements ListAdapter {
             return;
         }
         Log.d("ValueListAdapter", "Characteristic data for " + characteristic + " updated");
-        notifyDataSetChanged();
         characteristicData.put(characteristic, data);
+        notifyDataSetChanged();
+    }
+
+    public void update(BLECommunicator.CommunicatorBinder serviceBinder, String mac) {
+        for(Characteristic characteristic : characteristics){
+            if(serviceBinder.queryCachedData(mac, characteristic) != null){
+                characteristicData.put(characteristic, serviceBinder.queryCachedData(mac, characteristic));
+            }
+        }
+        notifyDataSetChanged();
     }
 }

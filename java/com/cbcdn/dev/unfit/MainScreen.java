@@ -105,6 +105,7 @@ public class MainScreen extends Activity {
             serviceBinder = (BLECommunicator.CommunicatorBinder) service;
             serviceBinder.registerCallback(currentMAC, updaterCallback);
             updateDisplay();
+            listAdapter.update(serviceBinder, currentMAC);
         }
 
         @Override
@@ -128,8 +129,8 @@ public class MainScreen extends Activity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if(serviceBinder != null){
             unbindService(serviceConnection);
         }

@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import com.cbcdn.dev.unfit.callbacks.BLECallback;
+import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Command;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.BTLEState;
 import com.cbcdn.dev.unfit.callbacks.PairingCallback;
@@ -138,6 +139,15 @@ public class BLECommunicator extends Service {
                 device.unregisterGenericCallback(callback);
             }
         }
+
+        public byte[] queryCachedData(String mac, Characteristic characteristic) {
+            BLEDevice device = devices.get(mac);
+            if(device != null) {
+                Log.d("BLE service", "Fetching cached data for " + characteristic + " on " + mac);
+                return device.queryCachedData(characteristic);
+            }
+            return null;
+        }
     }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -185,6 +195,8 @@ public class BLECommunicator extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        //FIXME might want to return a specific binder already instantiated for a specific device
+        //TODO also have callbacks be connected to a binder
         return binder;
     }
 }

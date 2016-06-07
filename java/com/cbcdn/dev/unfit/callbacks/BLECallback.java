@@ -4,6 +4,8 @@ import com.cbcdn.dev.unfit.BLEDevice;
 import com.cbcdn.dev.unfit.helpers.ConstMapper.Characteristic;
 
 public abstract class BLECallback {
+    //TODO have callback chains automatically generate a progress indicator
+
     private BLECallback continuation = null;
 
     public BLECallback(BLECallback continuation){
